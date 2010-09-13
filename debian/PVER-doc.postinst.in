@@ -1,0 +1,29 @@
+#! /bin/sh -e
+
+if [ -x /usr/sbin/install-info ]; then
+    install-info --quiet --section "Python" "Python" \
+        --description="Python @VER@ Library Reference" \
+        /usr/share/info/@PVER@-lib.info
+    #install-info --quiet --section "Python" "Python" \
+    #    --description="Python @VER@ Macintosh Modules" \
+    #    /usr/share/info/@PVER@-mac.info
+    install-info --quiet --section "Python" "Python" \
+        --description="Python @VER@ Reference Manual" \
+        /usr/share/info/@PVER@-ref.info
+    install-info --quiet --section "Python" "Python" \
+        --description="Python/C @VER@ API Reference Manual" \
+        /usr/share/info/@PVER@-api.info
+    install-info --quiet --section "Python" "Python" \
+        --description="Extending & Embedding Python @VER@" \
+        /usr/share/info/@PVER@-ext.info
+    install-info --quiet --section "Python" "Python" \
+        --description="Python @VER@ Tutorial" \
+        /usr/share/info/@PVER@-tut.info
+    install-info --quiet --section "Python" "Python" \
+        --description="Distributing Python Modules (@VER@)" \
+        /usr/share/info/@PVER@-dist.info
+fi
+
+#DEBHELPER#
+
+exit 0

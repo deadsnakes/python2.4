@@ -1,0 +1,29 @@
+--- Lib/site.py~	2008-02-26 13:03:31.000000000 +0100
++++ Lib/site.py	2008-02-26 13:21:07.000000000 +0100
+@@ -92,16 +92,6 @@
+     sys.path[:] = L
+     return known_paths
+ 
+-# XXX This should not be part of site.py, since it is needed even when
+-# using the -S option for Python.  See http://www.python.org/sf/586680
+-def addbuilddir():
+-    """Append ./build/lib.<platform> in case we're running in the build dir
+-    (especially for Guido :-)"""
+-    from distutils.util import get_platform
+-    s = "build/lib%s.%s-%.3s" % (sys.pydebug and '_d' or '', get_platform(), sys.version)
+-    s = os.path.join(os.path.dirname(sys.path[-1]), s)
+-    sys.path.append(s)
+-
+ def _init_pathinfo():
+     """Return a set containing all existing directory entries from sys.path"""
+     d = set()
+@@ -376,9 +366,6 @@
+ def main():
+     abs__file__()
+     paths_in_sys = removeduppaths()
+-    if (os.name == "posix" and sys.path and
+-        os.path.basename(sys.path[-1]) == "Modules"):
+-        addbuilddir()
+     paths_in_sys = addsitepackages(paths_in_sys)
+     if sys.platform == 'os2emx':
+         setBEGINLIBPATH()

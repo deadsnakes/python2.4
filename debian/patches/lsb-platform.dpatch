@@ -1,0 +1,53 @@
+#! /bin/sh -e
+
+# DP: determine the platform from /etc/lsb-release
+
+dir=
+if [ $# -eq 3 -a "$2" = '-d' ]; then
+    pdir="-d $3"
+    dir="$3/"
+elif [ $# -ne 1 ]; then
+    echo >&2 "usage: `basename $0`: -patch|-unpatch [-d <srcdir>]"
+    exit 1
+fi
+case "$1" in
+    -patch)
+        patch $pdir -f --no-backup-if-mismatch -p0 < $0
+        ;;
+    -unpatch)
+        patch $pdir -f --no-backup-if-mismatch -R -p0 < $0
+        ;;
+    *)
+	echo >&2 "usage: `basename $0`: -patch|-unpatch [-d <srcdir>]"
+        exit 1
+esac
+exit 0
+
+--- Lib/platform.py~	2005-11-21 18:01:49.000000000 +0100
++++ Lib/platform.py	2006-09-25 13:42:26.584505750 +0200
+@@ -236,6 +236,25 @@
+     except os.error:
+         # Probably not a Unix system
+         return distname,version,id
++
++    if os.path.exists('/etc/lsb-release'):
++        for line in open('/etc/lsb-release'):
++            line = line.strip()
++            if not line:
++                continue
++            var, arg = line.split('=', 1)
++            if var.startswith('DISTRIB_'):
++                var = var[8:]
++                if arg.startswith('"') and arg.endswith('"'):
++                    arg = arg[1:-1]
++                if var == 'ID':
++                    distname = arg
++                elif var == 'RELEASE':
++                    version = arg
++                elif var == 'CODENAME':
++                    id = arg
++        return distname,version,id
++
+     for file in etc:
+         m = _release_filename.match(file)
+         if m:

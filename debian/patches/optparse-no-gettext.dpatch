@@ -1,0 +1,41 @@
+#! /bin/sh -e
+
+# DP: optparse.py: only import gettext, if available.
+
+dir=
+if [ $# -eq 3 -a "$2" = '-d' ]; then
+    pdir="-d $3"
+    dir="$3/"
+elif [ $# -ne 1 ]; then
+    echo >&2 "usage: `basename $0`: -patch|-unpatch [-d <srcdir>]"
+    exit 1
+fi
+case "$1" in
+    -patch)
+        patch $pdir -f --no-backup-if-mismatch -p0 < $0
+        #cd ${dir}gcc && autoconf
+        ;;
+    -unpatch)
+        patch $pdir -f --no-backup-if-mismatch -R -p0 < $0
+        #rm ${dir}gcc/configure
+        ;;
+    *)
+	echo >&2 "usage: `basename $0`: -patch|-unpatch [-d <srcdir>]"
+        exit 1
+esac
+exit 0
+
+--- Lib/optparse.py~	2004-10-28 08:41:59.000000000 +0200
++++ Lib/optparse.py	2004-12-07 06:41:09.000000000 +0100
+@@ -69,7 +69,10 @@
+ import sys, os
+ import types
+ import textwrap
+-from gettext import gettext as _
++try:
++    from gettext import gettext as _
++except ImportError:
++    _ = lambda arg: arg
+ 
+ def _repr(self):
+     return "<%s at 0x%x: %s>" % (self.__class__.__name__, id(self), self)
