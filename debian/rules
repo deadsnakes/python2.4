@@ -76,6 +76,13 @@ ifeq ($(distribution),Ubuntu)
     doc_dependencies := stamp-unpack-doc
   endif
 endif
+
+USE_L2H = yes
+with_doc := yes
+build_target := build-doc
+#install_target := install
+python_for_doc = $(PY_INTERPRETER)
+
 ifeq ($(USE_L2H),yes)
   doc_dependencies := stamp-doc-html stamp-doc-info update-doc
 endif
