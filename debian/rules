@@ -718,7 +718,7 @@ else
 	dh_installdirs -p$(p_gdbm)-dbg \
 		$(scriptdir)/lib-dynload \
 		/usr/lib/debug/$(scriptdir)/lib-dynload
-	dh_install -p$(p_gdbm)-dbg --sourcedir $(d_dbg) \
+	dh_install --autodest -p$(p_gdbm)-dbg --sourcedir $(d_dbg) \
 	    /$(scriptdir)/lib-dynload/gdbm_d.so \
 	    /usr/lib/debug/$(scriptdir)/lib-dynload/gdbm.so
 endif
@@ -730,7 +730,7 @@ else
 	dh_installdirs -p$(p_tk)-dbg \
 		$(scriptdir)/lib-dynload \
 		/usr/lib/debug/$(scriptdir)/lib-dynload
-	dh_install -p$(p_tk)-dbg --sourcedir $(d_dbg) \
+	dh_install --autodest -p$(p_tk)-dbg --sourcedir $(d_dbg) \
 	    /$(scriptdir)/lib-dynload/_tkinter_d.so \
 	    /usr/lib/debug/$(scriptdir)/lib-dynload/tkinter.so
 endif
