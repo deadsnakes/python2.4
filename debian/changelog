@@ -4,8 +4,10 @@ python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa6~maverick1) maverick; urgency=low
     - Also set distribution in debian/rules to Ubuntu-PPA so Maintainer doesn't
       get overridden.
   * Bump Standards-Version to 3.8.4.
+  * Correctly depend on and suggest related packages.
+    - Specifically Tk for Idle and Tk and GDBM debug packages.
 
- -- Felix Krull <f_krull@gmx.de>  Mon, 13 Sep 2010 15:36:57 +0200
+ -- Felix Krull <f_krull@gmx.de>  Mon, 13 Sep 2010 15:41:26 +0200
 
 python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa5) lucid; urgency=low
 
