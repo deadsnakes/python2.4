@@ -706,10 +706,26 @@ endif
 ifneq ($(with_gdbm),yes)
 	rm -f $(d_dbg)/$(scriptdir)/lib-dynload/gdbm_d.so
 	rm -f $(d_dbg)/usr/lib/debug/$(scriptdir)/lib-dynload/gdbm.so
+else
+	# move debug files to corresponding debug package
+	dh_installdirs -p$(p_gdbm)-dbg \
+		$(scriptdir)/lib-dynload \
+		/usr/lib/debug/$(scriptdir)/lib-dynload
+	dh_install -p$(p_gdbm)-dbg --sourcedir $(d_dbg) \
+	    /$(scriptdir)/lib-dynload/gdbm_d.so \
+	    /usr/lib/debug/$(scriptdir)/lib-dynload/gdbm.so
 endif
 ifneq ($(with_tk),yes)
 	rm -f $(d_dbg)/$(scriptdir)/lib-dynload/_tkinter_d.so
 	rm -f $(d_dbg)/usr/lib/debug/$(scriptdir)/lib-dynload/_tkinter.so
+else
+	# move debug files to corresponding debug package
+	dh_installdirs -p$(p_tk)-dbg \
+		$(scriptdir)/lib-dynload \
+		/usr/lib/debug/$(scriptdir)/lib-dynload
+	dh_install -p$(p_tk)-dbg --sourcedir $(d_dbg) \
+	    /$(scriptdir)/lib-dynload/_tkinter_d.so \
+	    /usr/lib/debug/$(scriptdir)/lib-dynload/tkinter.so
 endif
 	cp -a $(d)-dbg/$(scriptdir)/config_d $(d_dbg)/$(scriptdir)/
 	for i in $(d_dev)/usr/include/$(PVER)/*; do \
