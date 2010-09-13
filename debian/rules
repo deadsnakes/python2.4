@@ -119,8 +119,8 @@ scriptdir	=  usr/lib/python$(VER)
 # package names and directories
 p_base	:= $(PVER)
 p_min	:= $(PVER)-minimal
-p_tk	:= $(PVER)-tk
-p_gdbm	:= $(PVER)-gdbm
+p_tk	:= $(PVER)-tk-deadsnakes
+p_gdbm	:= $(PVER)-gdbm-deadsnakes
 p_dev	:= $(PVER)-dev
 p_exam	:= $(PVER)-examples
 #p_xml	:= $(PVER)-xmlbase
