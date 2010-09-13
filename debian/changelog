@@ -6,8 +6,9 @@ python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa6~maverick1) maverick; urgency=low
   * Bump Standards-Version to 3.8.4.
   * Correctly depend on and suggest related packages.
     - Specifically Tk for Idle and Tk and GDBM debug packages.
+  * Build GDBM and Tk from this package.
 
- -- Felix Krull <f_krull@gmx.de>  Mon, 13 Sep 2010 15:41:26 +0200
+ -- Felix Krull <f_krull@gmx.de>  Mon, 13 Sep 2010 15:45:58 +0200
 
 python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa5) lucid; urgency=low
 
