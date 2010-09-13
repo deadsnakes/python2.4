@@ -21,8 +21,8 @@ ifneq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
 endif
   WITHOUT_CHECK := yes
 
-distribution := $(shell lsb_release -is)
-#distribution := Ubuntu
+#distribution := $(shell lsb_release -is)
+distribution := Ubuntu-PPA
 
 export VER=2.4
 export NVER=2.5

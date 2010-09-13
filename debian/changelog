@@ -1,3 +1,12 @@
+python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa6~maverick1) maverick; urgency=low
+
+  * Fix Maintainer field.
+    - Also set distribution in debian/rules to Ubuntu-PPA so Maintainer doesn't
+      get overridden.
+  * Bump Standards-Version to 3.8.4.
+
+ -- Felix Krull <f_krull@gmx.de>  Mon, 13 Sep 2010 15:36:57 +0200
+
 python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa5) lucid; urgency=low
 
   * python-idle: Depend on python2.4-tk-deadsnakes as well.
