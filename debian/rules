@@ -55,18 +55,18 @@ with_gdbm := yes
 with_interp := static
 #with_interp := shared
 
-ifneq (,$(findstring -doc, $(PKGSOURCE)))
+#ifneq (,$(findstring -doc, $(PKGSOURCE)))
   USE_L2H = yes
   with_doc := yes
   build_target := build-doc
   #install_target := install
   python_for_doc = $(PY_INTERPRETER)
-else
-  build_target := build
-  install_target := install
-  python_for_doc = $(buildd_static)/python
-  dh_args = -N$(p_doc)
-endif
+#else
+#  build_target := build
+#  install_target := install
+#  python_for_doc = $(buildd_static)/python
+#  dh_args = -N$(p_doc)
+#endif
 ifeq ($(distribution),Ubuntu)
   dh_args :=
   ifneq (,$(findstring -doc, $(PKGSOURCE)))
@@ -80,7 +80,7 @@ ifeq ($(USE_L2H),yes)
   doc_dependencies := stamp-doc-html stamp-doc-info update-doc
 endif
 
-PY_INTERPRETER = /usr/bin/python$(VER)
+PY_INTERPRETER = /usr/bin/python
 
 ifeq ($(DEFAULT_VERSION),yes)
   PY_PRIO = standard

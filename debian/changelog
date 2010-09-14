@@ -9,8 +9,9 @@ python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa6~maverick1) maverick; urgency=low
   * Build GDBM and Tk from this package.
     - Those are generated as python2.4-tk-deadsnakes etc. so they don't
       conflict with python-tk etc.
+  * Brutally force building of documentation.
 
- -- Felix Krull <f_krull@gmx.de>  Mon, 13 Sep 2010 17:07:22 +0200
+ -- Felix Krull <f_krull@gmx.de>  Tue, 14 Sep 2010 13:32:58 +0200
 
 python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa5) lucid; urgency=low
 
