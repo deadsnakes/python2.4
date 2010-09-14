@@ -1,8 +1,11 @@
-python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa6~lucid1) lucid; urgency=low
+python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa7~lucid1) lucid; urgency=low
 
-  * Merge from Maverick package.
+  * Fix documentation build.
+    - Mostly by merging large chunks of the python2.5 debian/rules which
+      is in a better state in that regard.
+  * Conflict old python-tk-deadsnakes and friends.
 
- -- Felix Krull <f_krull@gmx.de>  Tue, 14 Sep 2010 14:15:31 +0200
+ -- Felix Krull <f_krull@gmx.de>  Tue, 14 Sep 2010 19:12:20 +0200
 
 python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa6~maverick1) maverick; urgency=low
 
