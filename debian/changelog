@@ -1,3 +1,11 @@
+python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa7~maverick1) maverick; urgency=low
+
+  * Fix documentation build.
+    - Mostly by merging large chunks of the python2.5 debian/rules which
+      is in a better state in that regard.
+
+ -- Felix Krull <f_krull@gmx.de>  Tue, 14 Sep 2010 18:48:11 +0200
+
 python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa6~maverick1) maverick; urgency=low
 
   * Fix Maintainer field.

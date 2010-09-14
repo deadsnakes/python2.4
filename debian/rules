@@ -8,6 +8,8 @@ export SHELL = /bin/bash
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+DEB_BUILD_OPTIONS := "nocheck"
+
 DEB_BUILD_ARCH		?= $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 DEB_BUILD_ARCH_OS	?= $(shell dpkg-architecture -qDEB_BUILD_ARCH_OS)
 
@@ -55,32 +57,13 @@ with_gdbm := yes
 with_interp := static
 #with_interp := shared
 
-#ifneq (,$(findstring -doc, $(PKGSOURCE)))
-  USE_L2H = yes
-  with_doc := yes
-  build_target := build-doc
-  #install_target := install
-  python_for_doc = $(PY_INTERPRETER)
-#else
-#  build_target := build
-#  install_target := install
-#  python_for_doc = $(buildd_static)/python
-#  dh_args = -N$(p_doc)
-#endif
-ifeq ($(distribution),Ubuntu)
-  dh_args :=
-  ifneq (,$(findstring -doc, $(PKGSOURCE)))
-    with_doc :=
-  else
-    with_doc := yes
-    doc_dependencies := stamp-unpack-doc
-  endif
-endif
-ifeq ($(USE_L2H),yes)
-  doc_dependencies := stamp-doc-html stamp-doc-info update-doc
-endif
+USE_L2H = yes
+with_doc := yes
+build_target := build-all
+install_target := install
+python_for_doc = $(buildd_static)/python
 
-PY_INTERPRETER = /usr/bin/python
+PY_INTERPRETER = /usr/bin/python$(VER)
 
 ifeq ($(DEFAULT_VERSION),yes)
   PY_PRIO = standard
@@ -125,7 +108,6 @@ p_tk_dbg := $(p_tk)-dbg
 p_gdbm_dbg := $(p_gdbm)-dbg
 p_dev	:= $(PVER)-dev
 p_exam	:= $(PVER)-examples
-#p_xml	:= $(PVER)-xmlbase
 p_idle	:= idle-$(PVER)
 p_doc	:= $(PVER)-doc
 p_dbg	:= $(PVER)-dbg
@@ -138,12 +120,12 @@ d_tk_dbg := debian/$(p_tk_dbg)
 d_gdbm_dbg := debian/$(p_gdbm_dbg)
 d_dev	:= debian/$(p_dev)
 d_exam	:= debian/$(p_exam)
-#d_xml	:= debian/$(p_xml)
 d_idle	:= debian/$(p_idle)
 d_doc	:= debian/$(p_doc)
 d_dbg	:= debian/$(p_dbg)
 
 build: $(build_target)
+build-all: stamp-build
 stamp-build: stamp-build-static stamp-build-shared stamp-build-debug stamp-mincheck stamp-check stamp-pystone
 	touch stamp-build
 
@@ -180,6 +162,7 @@ ifeq ($(with_fpectl),yes)
 endif
 
 stamp-configure-shared: patch-stamp
+	rm -rf $(buildd_shared)
 	mkdir -p $(buildd_shared)
 	cd $(buildd_shared) && \
 	  CC="$(CC)" $(OPTSETTINGS) \
@@ -190,6 +173,7 @@ stamp-configure-shared: patch-stamp
 	touch stamp-configure-shared
 
 stamp-configure-static: patch-stamp
+	rm -rf $(buildd_static)
 	mkdir -p $(buildd_static)
 	cd $(buildd_static) && \
 	  CC="$(CC)" $(OPTSETTINGS) \
@@ -205,6 +189,7 @@ stamp-configure-static: patch-stamp
 	touch stamp-configure-static
 
 stamp-configure-debug: patch-stamp
+	rm -rf $(buildd_debug)
 	mkdir -p $(buildd_debug)
 	cd $(buildd_debug) && \
 	  CC="$(CC)" $(OPTDEBUGSETTINGS) \
@@ -343,24 +328,24 @@ stamp-doc-info:
 	touch stamp-doc-info
 
 build-doc: patch-stamp stamp-build-doc
-stamp-build-doc: $(doc_dependencies)
+stamp-build-doc: stamp-doc-html stamp-doc-info
 	touch stamp-build-doc
 
-update-doc:
-ifeq ($(distribution),Ubuntu)
-	: # copy just build docs to debian/patches
-	tar cfj - Doc/html-*.tar Doc/info/*.info* \
-	    | uuencode -m docs.tar.bz2 > debian/patches/docs.uue
-#	tar cfj - Doc/html-*.tar \
+#update-doc:
+#ifeq ($(distribution),Ubuntu)
+#	: # copy just build docs to debian/patches
+#	tar cfj - Doc/html-*.tar Doc/info/*.info* \
 #	    | uuencode -m docs.tar.bz2 > debian/patches/docs.uue
-endif
-
-stamp-unpack-doc:
-	uudecode debian/patches/docs.uue
-	tar xfj docs.tar.bz2
-	rm -f docs.tar.bz2
-	touch stamp-unpack-doc
-
+##	tar cfj - Doc/html-*.tar \
+##	    | uuencode -m docs.tar.bz2 > debian/patches/docs.uue
+#endif
+#
+#stamp-unpack-doc:
+#	uudecode debian/patches/docs.uue
+#	tar xfj docs.tar.bz2
+#	rm -f docs.tar.bz2
+#	touch stamp-unpack-doc
+#
 ifneq (,$(findstring -doc, $(PKGSOURCE)))
   control_files = debian/control.doc
 else
@@ -412,10 +397,6 @@ clean: control-file
 	        rm -f $$f2; \
 	    fi; \
 	done
-ifneq (,$(findstring -doc, $(PKGSOURCE)))
-	rm -f debian/patches/docs.uue
-endif
-	rm -rf debian/tmp-dbg
 	dh_clean
 
 stamp-control:
@@ -427,6 +408,7 @@ stamp-control:
 		sed -e "s/@PVER@/$(PVER)/g;s/@VER@/$(VER)/g" \
 		    -e "s/@PRIORITY@/$(PRIORITY)/g" \
 		    -e "s,@SCRIPTDIR@,/$(scriptdir),g" \
+		    -e "s,@INFO@,$(info_docs),g" \
 		  <$$f >$$f2; \
 	    fi; \
 	done
@@ -458,7 +440,8 @@ endif
 	: # move manpages to new names
 	if [ -d $(d)/usr/man/man1 ]; then \
 	    mkdir -p $(d)/usr/share/man; \
-	    mv $(d)/usr/man/man1 $(d)/usr/share/man/; \
+	    mv $(d)/usr/man/man1/* $(d)/usr/share/man/man1/; \
+	    rm -rf $(d)/usr/man/; \
 	fi
 	mv $(d)/usr/share/man/man1/python.1 \
 		$(d)/usr/share/man/man1/python$(VER).1
