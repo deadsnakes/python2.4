@@ -1,0 +1,141 @@
+Source: python2.4
+Section: python
+Priority: optional
+Maintainer: Felix Krull <f_krull@gmx.de>
+XSBC-Original-Maintainer: Matthias Klose <doko@debian.org>
+Build-Depends: debhelper (>= 5), autoconf, libreadline-dev, libncursesw5-dev (>= 5.3), tk8.5-dev, libdb4.8-dev, zlib1g-dev, libgdbm-dev, blt-dev (>= 2.4z), libssl-dev, sharutils, libbz2-dev, libbluetooth-dev [!hurd-i386 !kfreebsd-i386 !kfreebsd-amd64], locales, mime-support, libgpm2 [!hurd-i386 !kfreebsd-i386 !kfreebsd-amd64], netbase, lsb-release, bzip2
+Build-Depends-Indep: libhtml-tree-perl, texlive-latex-recommended, texinfo, emacs22, debiandoc-sgml, sharutils, latex2html, python
+Build-Conflicts: tcl8.3-dev, tk8.3-dev, python2.4-xml, python-xml
+XS-Python-Version: 2.4
+Standards-Version: 3.8.4
+Homepage: http://python.org/
+
+Package: python2.4
+Architecture: any
+Priority: optional
+Depends: python2.4-minimal (= ${binary:Version}), mime-support, ${shlibs:Depends}
+Suggests: python2.4-doc, python2.4-profiler
+Provides: python2.4-cjkcodecs, python2.4-plist
+Replaces: python2.4-minimal (<< 2.4-3), python2.4-dev (<= 2.4.4-4), idle-python2.4 (<< 2.4.3-8), python-tk (<< 2.4.3-2)
+Conflicts: python2.4-dev (<< 2.3.95-2), python-central (<< 0.5), idle-python2.4 (<< 2.4.3-8), python-tk (<< 2.4.3-2)
+XB-Python-Version: 2.4
+Description: An interactive high-level object-oriented language (version 2.4)
+ Version 2.4 of the high-level, interactive object oriented language,
+ includes an extensive class library with lots of goodies for
+ network programming, system administration, sounds and graphics.
+
+Package: python2.4-minimal
+Architecture: any
+Priority: optional
+Depends: ${shlibs:Depends}
+Suggests: binfmt-support
+Conflicts: binfmt-support (<< 1.1.2)
+Replaces: python2.4 (<< 2.4.4-8)
+Recommends:  python2.4
+XB-Python-Runtime: python2.4
+XB-Python-Version: 2.4
+Description: A minimal subset of the Python language (version 2.4)
+ This package contains the interpreter and some essential modules.  It can
+ be used in the boot process for some basic tasks.
+ See /usr/share/doc/python2.4-minimal/README.Debian for a list of the modules
+ contained in this package.
+
+Package: python2.4-examples
+Architecture: all
+Depends: python2.4 (>= ${binary:Version})
+Description: Examples for the Python language (v2.4)
+ Examples, Demos and Tools for Python (v2.4). These are files included in
+ the upstream Python distribution (v2.4).
+
+Package: python2.4-dev
+Architecture: any
+Depends: python2.4 (= ${binary:Version})
+Recommends: libc6-dev | libc-dev
+Description: Header files and a static library for Python (v2.4)
+ Header files, a static library and development tools for building
+ Python (v2.4) modules, extending the Python interpreter or embedding
+ Python (v2.4) in applications.
+ .
+ Maintainers of Python packages should read README.maintainers.
+
+Package: idle-python2.4
+Architecture: all
+Depends: python2.4, python2.4-tk-deadsnakes
+Enhances: python2.4
+XB-Python-Version: 2.4
+Description: An IDE for Python (v2.4) using Tkinter
+ IDLE is an Integrated Development Environment for Python (v2.4).
+ IDLE is written using Tkinter and therefore quite platform-independent.
+
+Package: python2.4-doc
+Section: doc
+Architecture: all
+Suggests: python2.4
+Description: Documentation for the high-level object-oriented language Python (v2.4)
+ These is the official set of documentation for the interactive high-level
+ object-oriented language Python (v2.4). All documents are provided
+ in HTML format, some in info format. The package consists of ten documents:
+ .
+   * What's New in Python2.4
+   * Tutorial
+   * Python Library Reference
+   * Macintosh Module Reference
+   * Python Language Reference
+   * Extending and Embedding Python
+   * Python/C API Reference
+   * Installing Python Modules
+   * Documenting Python
+   * Distributing Python Modules
+
+Package: python2.4-dbg
+Architecture: any
+Priority: extra
+Depends: python2.4 (>= ${binary:Version}), ${shlibs:Depends}
+Suggests: python2.4-gdbm-deadsnakes-dbg, python2.4-tk-deadsnakes-dbg
+Description: Debug Build of the Python Interpreter (version 2.4)
+ Python interpreter configured with --pydebug. Dynamically loaded modules are
+ searched in /usr/lib/python2.4/lib-dynload/debug first.
+
+
+Package: python2.4-tk-deadsnakes
+Architecture: any
+Depends: python2.4, ${python:Depends}, ${shlibs:Depends}, ${misc:Depends}
+Provides: ${python:Provides}
+Suggests: tix, python2.4-tk-deadsnakes-dbg
+XB-Python-Version: ${python:Versions}
+Description: Tkinter - Writing Tk applications with Python (v2.4)
+ A module for writing portable GUI applications with Python (v2.4) using Tk.
+ Also known as Tkinter.
+
+Package: python2.4-gdbm-deadsnakes
+Architecture: any
+Depends: python2.4, ${python:Depends}, ${shlibs:Depends}, ${misc:Depends}
+Provides: ${python:Provides}
+Suggests: python2.4-gdbm-deadsnakes-dbg
+XB-Python-Version: ${python:Versions}
+Description: GNU dbm database support for Python (v2.4)
+ GNU dbm database module for Python (v2.4). Install this if you want to
+ create or read GNU dbm database files with Python.
+
+Package: python2.4-tk-deadsnakes-dbg
+Architecture: any
+Priority: extra
+Section: debug
+Depends: python2.4, ${python:Depends}, python2.4-tk-deadsnakes (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Tkinter - Writing Tk applications with Python (v2.4 debug extension)
+ A module for writing portable GUI applications with Python (v2.4) using Tk.
+ Also known as Tkinter.
+ .
+ This package contains the extensions built for the python debug interpreter.
+
+Package: python2.4-gdbm-deadsnakes-dbg
+Architecture: any
+Priority: extra
+Section: debug
+Depends: python2.4, ${python:Depends}, python2.4-gdbm-deadsnakes (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: GNU dbm database support for Python (v2.4 debug extension)
+ GNU dbm database module for Python (v2.4). Install this if you want to
+ create or read GNU dbm database files with Python.
+ .
+ This package contains the extensions built for the python debug interpreter.
+
