@@ -1,3 +1,9 @@
+python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa6~lucid1) lucid; urgency=low
+
+  * Merge from Maverick package.
+
+ -- Felix Krull <f_krull@gmx.de>  Tue, 14 Sep 2010 14:15:31 +0200
+
 python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa6~maverick1) maverick; urgency=low
 
   * Fix Maintainer field.
