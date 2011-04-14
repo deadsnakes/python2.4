@@ -1,0 +1,722 @@
+#! /bin/sh -e
+
+# DP: Reapply all changes from the 2.4 branch, which were reverted upstream
+# DP: for the 2.4.5 security release.
+
+dir=
+if [ $# -eq 3 -a "$2" = '-d' ]; then
+    pdir="-d $3"
+    dir="$3/"
+elif [ $# -ne 1 ]; then
+    echo >&2 "usage: `basename $0`: -patch|-unpatch [-d <srcdir>]"
+    exit 1
+fi
+case "$1" in
+    -patch)
+        patch $pdir -f --no-backup-if-mismatch -R -p0 < $0
+        autoconf
+        ;;
+    -unpatch)
+        patch $pdir -f --no-backup-if-mismatch -p0 < $0
+        rm -f configure
+        ;;
+    *)
+	echo >&2 "usage: `basename $0`: -patch|-unpatch [-d <srcdir>]"
+        exit 1
+esac
+exit 0
+
+# svn diff http://svn.python.org/projects/python/tags/r245 http://svn.python.org/projects/python/branches/release24-maint
+# diff -urN --exclude=.svn Python-2.4.5 svn
+
+Index: Python/ceval.c
+===================================================================
+--- Python/ceval.c	(revision 61178)
++++ Python/ceval.c	(revision 61179)
+@@ -179,10 +179,10 @@
+ PyObject *
+ PyEval_GetCallStats(PyObject *self)
+ {
+-	return Py_BuildValue("iiiiiiiiiii",
++	return Py_BuildValue("iiiiiiiiii",
+ 			     pcall[0], pcall[1], pcall[2], pcall[3],
+ 			     pcall[4], pcall[5], pcall[6], pcall[7],
+-			     pcall[8], pcall[9], pcall[10]);
++			     pcall[8], pcall[9]);
+ }
+ #else
+ #define PCALL(O)
+@@ -4073,10 +4073,8 @@
+ 		value = PyObject_GetAttr(v, name);
+ 		if (value == NULL)
+ 			err = -1;
+-		else if (PyDict_CheckExact(locals))
+-			err = PyDict_SetItem(locals, name, value);
+ 		else
+-			err = PyObject_SetItem(locals, name, value);
++			err = PyDict_SetItem(locals, name, value);
+ 		Py_DECREF(name);
+ 		Py_XDECREF(value);
+ 		if (err != 0)
+Index: Misc/NEWS
+===================================================================
+--- Misc/NEWS	(revision 61178)
++++ Misc/NEWS	(revision 61179)
+@@ -15,31 +15,16 @@
+ 
+ - patch #1630975: Fix crash when replacing sys.stdout in sitecustomize.py
+ 
+-- Bug #1590891: random.randrange don't return correct value for big number
+-
+-- Bug #1542016: make sys.callstats() match its docstring and return an
+-  11-tuple (only relevant when Python is compiled with -DCALL_PROFILE).
+-
+ Extension Modules
+ -----------------
+ 
+ Library
+ -------
+ 
+-- Issue #1336: fix a race condition in subprocess.Popen if the garbage
+-  collector kicked in at the wrong time that would cause the process
+-  to hang when the child wrote to stderr.
+-
+-- Bug #1728403: Fix a bug that CJKCodecs StreamReader hangs when it
+-  reads a file that ends with incomplete sequence and sizehint argument
+-  for .read() is specified.
+-
+ - HTML-escape the plain traceback in cgitb's HTML output, to prevent
+   the traceback inadvertently or maliciously closing the comment and
+   injecting HTML into the error page.
+ 
+-- idle: Honor the "Cancel" action in the save dialog (Debian bug #299092).
+-
+ Tests
+ -----
+ 
+@@ -204,9 +189,6 @@
+ Library
+ -------
+ 
+-- Patch 1571379: Make trace's --ignore-dir facility work in the face of
+-  relative directory names.
+-
+ - Bug #1545341: The 'classifier' keyword argument to the Distutils setup()
+   function now accepts tuples as well as lists.
+ 
+Index: Mac/BuildScript/build-installer.py
+===================================================================
+--- Mac/BuildScript/build-installer.py	(revision 61178)
++++ Mac/BuildScript/build-installer.py	(revision 61179)
+@@ -10,7 +10,7 @@
+ Usage: see USAGE variable in the script.
+ """
+ import platform, os, sys, getopt, textwrap, shutil, urllib2, stat, time, pwd
+-import grp, md5
++import grp
+ 
+ INCLUDE_TIMESTAMP=1
+ VERBOSE=1
+@@ -33,7 +33,7 @@
+ 
+ def shellQuote(value):
+     """
+-    Return the string value in a form that can safely be inserted into
++    Return the string value in a form that can savely be inserted into
+     a shell command.
+     """
+     return "'%s'"%(value.replace("'", "'\"'\"'"))
+@@ -56,13 +56,13 @@
+ 
+     raise RuntimeError, "Cannot find full version??"
+ 
+-# The directory we'll use to create the build (will be erased and recreated)
++# The directory we'll use to create the build, will be erased and recreated
+ WORKDIR="/tmp/_py24"
+ 
+-# The directory we'll use to store third-party sources. Set this to something
++# The directory we'll use to store third-party sources, set this to something
+ # else if you don't want to re-fetch required libraries every time.
+ DEPSRC=os.path.join(WORKDIR, 'third-party')
+-DEPSRC=os.path.expanduser('/tmp/other-sources')
++DEPSRC=os.path.expanduser('~/Universal/other-sources')
+ 
+ # Location of the preferred SDK
+ SDKPATH="/Developer/SDKs/MacOSX10.4u.sdk"
+@@ -94,9 +94,8 @@
+ # batteries included python.
+ LIBRARY_RECIPES=[
+     dict(
+-        name="Bzip2 1.0.4",
+-        url="http://www.bzip.org/1.0.4/bzip2-1.0.4.tar.gz",
+-        checksum="fc310b254f6ba5fbb5da018f04533688",
++        name="Bzip2 1.0.3",
++        url="http://www.bzip.org/1.0.3/bzip2-1.0.3.tar.gz",
+         configure=None,
+         install='make install PREFIX=%s/usr/local/ CFLAGS="-arch %s -isysroot %s"'%(
+             shellQuote(os.path.join(WORKDIR, 'libraries')),
+@@ -107,7 +106,6 @@
+     dict(
+         name="ZLib 1.2.3",
+         url="http://www.gzip.org/zlib/zlib-1.2.3.tar.gz",
+-        checksum="debc62758716a169df9f62e6ab2bc634",
+         configure=None,
+         install='make install prefix=%s/usr/local/ CFLAGS="-arch %s -isysroot %s"'%(
+             shellQuote(os.path.join(WORKDIR, 'libraries')),
+@@ -119,7 +117,6 @@
+         # Note that GNU readline is GPL'd software
+         name="GNU Readline 5.1.4",
+         url="http://ftp.gnu.org/pub/gnu/readline/readline-5.1.tar.gz" ,
+-        checksum="7ee5a692db88b30ca48927a13fd60e46",
+         patchlevel='0',
+         patches=[
+             # The readline maintainers don't do actual micro releases, but
+@@ -134,7 +131,6 @@
+     dict(
+         name="NCurses 5.5",
+         url="http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.5.tar.gz",
+-        checksum='e73c1ac10b4bfc46db43b2ddfd6244ef',
+         configure_pre=[
+             "--without-cxx",
+             "--without-ada",
+@@ -163,7 +159,6 @@
+     dict(
+         name="Sleepycat DB 4.4",
+         url="http://downloads.sleepycat.com/db-4.4.20.tar.gz",
+-        checksum='d84dff288a19186b136b0daf7067ade3',
+         #name="Sleepycat DB 4.3.29",
+         #url="http://downloads.sleepycat.com/db-4.3.29.tar.gz",
+         buildDir="build_unix",
+@@ -193,7 +188,7 @@
+         long_name="GUI Applications",
+         source="/Applications/MacPython %(VER)s",
+         readme="""\
+-            This package installs IDLE (an interactive Python IDE),
++            This package installs IDLE (an interactive Python IDLE),
+             Python Launcher and Build Applet (create application bundles
+             from python scripts).
+ 
+@@ -249,7 +244,8 @@
+         readme="""\
+             This package updates the system python installation on
+             Mac OS X 10.3 to ensure that you can build new python extensions
+-            using that copy of python after installing this version.
++            using that copy of python after installing this version of
++            python.
+             """,
+         postflight="../OSX/fixapplepython23.py",
+         topdir="/Library/Frameworks/Python.framework",
+@@ -313,21 +309,8 @@
+         fatal("Please install the latest version of Xcode and the %s SDK"%(
+             os.path.basename(SDKPATH[:-4])))
+ 
+-    if os.path.exists('/sw'):
+-        fatal("Detected Fink, please remove before building Python")
+ 
+-    if os.path.exists('/opt/local'):
+-        fatal("Detected MacPorts, please remove before building Python")
+ 
+-    if not os.path.exists('/Library/Frameworks/Tcl.framework') or \
+-            not os.path.exists('/Library/Frameworks/Tk.framework'):
+-
+-        fatal("Please install a Universal Tcl/Tk framework in /Library from\n\thttp://tcltkaqua.sourceforge.net/")
+-
+-
+-
+-
+-
+ def parseOptions(args = None):
+     """
+     Parse arguments and update global settings.
+@@ -462,17 +445,6 @@
+         except:
+             pass
+ 
+-def verifyChecksum(path, checksum):
+-    summer = md5.md5()
+-    fp = open(path, 'rb')
+-    block = fp.read(10240)
+-    while block:
+-        summer.update(block)
+-        block = fp.read(10240)
+-
+-    return summer.hexdigest() == checksum
+-
+-
+ def buildRecipe(recipe, basedir, archList):
+     """
+     Build software using a recipe. This function does the
+@@ -494,17 +466,14 @@
+         os.mkdir(DEPSRC)
+ 
+ 
+-    if os.path.exists(sourceArchive) and verifyChecksum(sourceArchive, recipe['checksum']):
++    if os.path.exists(sourceArchive):
+         print "Using local copy of %s"%(name,)
+ 
+     else:
+         print "Downloading %s"%(name,)
+         downloadURL(url, sourceArchive)
+         print "Archive for %s stored as %s"%(name, sourceArchive)
+-        if not verifyChecksum(sourceArchive, recipe['checksum']):
+-            fatal("Download for %s failed: bad checksum"%(url,))
+ 
+-
+     print "Extracting archive for %s"%(name,)
+     buildDir=os.path.join(WORKDIR, '_bld')
+     if not os.path.exists(buildDir):
+@@ -655,15 +624,15 @@
+     print "Running make"
+     runCommand("make")
+ 
+-    print "Running make frameworkinstall"
++    print "Runing make frameworkinstall"
+     runCommand("make frameworkinstall DESTDIR=%s"%(
+         shellQuote(rootDir)))
+ 
+-    print "Running make frameworkinstallextras"
++    print "Runing make frameworkinstallextras"
+     runCommand("make frameworkinstallextras DESTDIR=%s"%(
+         shellQuote(rootDir)))
+ 
+-    print "Copying required shared libraries"
++    print "Copy required shared libraries"
+     if os.path.exists(os.path.join(WORKDIR, 'libraries', 'Library')):
+         runCommand("mv %s/* %s"%(
+             shellQuote(os.path.join(
+@@ -751,8 +720,8 @@
+ def packageFromRecipe(targetDir, recipe):
+     curdir = os.getcwd()
+     try:
+-        # The major version (such as 2.5) is included in the package name
+-        # because having two version of python installed at the same time is
++        # The major version (such as 2.5) is included in the pacakge name
++        # because haveing two version of python installed at the same time is
+         # common.
+         pkgname = '%s-%s'%(recipe['name'], getVersion())
+         srcdir  = recipe.get('source')
+@@ -926,7 +895,7 @@
+ 
+ def buildDMG():
+     """
+-    Create DMG containing the rootDir.
++    Create DMG containing the rootDir
+     """
+     outdir = os.path.join(WORKDIR, 'diskimage')
+     if os.path.exists(outdir):
+@@ -940,7 +909,7 @@
+ 
+     os.mkdir(outdir)
+     time.sleep(1)
+-    runCommand("hdiutil create -volname 'Universal MacPython %s' -srcfolder %s %s"%(
++    runCommand("hdiutil create -volname 'Univeral MacPython %s' -srcfolder %s %s"%(
+             getFullVersion(),
+             shellQuote(os.path.join(WORKDIR, 'installer')),
+             shellQuote(imagepath)))
+Index: Lib/idlelib/EditorWindow.py
+===================================================================
+--- Lib/idlelib/EditorWindow.py	(revision 61178)
++++ Lib/idlelib/EditorWindow.py	(revision 61179)
+@@ -703,7 +703,7 @@
+ 
+     def close(self):
+         reply = self.maybesave()
+-        if str(reply) != "cancel":
++        if reply != "cancel":
+             self._close()
+         return reply
+ 
+Index: Lib/random.py
+===================================================================
+--- Lib/random.py	(revision 61178)
++++ Lib/random.py	(revision 61179)
+@@ -205,7 +205,7 @@
+             raise ValueError, "empty range for randrange()"
+ 
+         if n >= maxwidth:
+-            return istart + istep*self._randbelow(n)
++            return istart + self._randbelow(n)
+         return istart + istep*int(self.random() * n)
+ 
+     def randint(self, a, b):
+Index: Lib/logging/__init__.py
+===================================================================
+--- Lib/logging/__init__.py	(revision 61178)
++++ Lib/logging/__init__.py	(revision 61179)
+@@ -1,4 +1,4 @@
+-# Copyright 2001-2007 by Vinay Sajip. All Rights Reserved.
++# Copyright 2001-2005 by Vinay Sajip. All Rights Reserved.
+ #
+ # Permission to use, copy, modify, and distribute this software and its
+ # documentation for any purpose and without fee is hereby granted,
+@@ -21,7 +21,7 @@
+ Should work under Python versions >= 1.5.2, except that source line
+ information is not available unless 'sys._getframe()' is.
+ 
+-Copyright (C) 2001-2007 Vinay Sajip. All Rights Reserved.
++Copyright (C) 2001-2004 Vinay Sajip. All Rights Reserved.
+ 
+ To use, simply 'import logging' and log away!
+ """
+@@ -68,7 +68,7 @@
+     except:
+         return sys.exc_traceback.tb_frame.f_back
+ 
+-if hasattr(sys, '_getframe'): currentframe = lambda: sys._getframe(3)
++if hasattr(sys, '_getframe'): currentframe = sys._getframe
+ # done filching
+ 
+ # _srcfile is only used in conjunction with sys._getframe().
+@@ -1318,14 +1318,14 @@
+     """
+     root.manager.disable = level
+ 
+-def shutdown(handlerList=_handlerList):
++def shutdown():
+     """
+     Perform any cleanup actions in the logging system (e.g. flushing
+     buffers).
+ 
+     Should be called at application exit.
+     """
+-    for h in handlerList[:]:
++    for h in _handlerList[:]: # was _handlers.keys():
+         #errors might occur, for example, if files are locked
+         #we just ignore them if raiseExceptions is not set
+         try:
+Index: Lib/logging/handlers.py
+===================================================================
+--- Lib/logging/handlers.py	(revision 61178)
++++ Lib/logging/handlers.py	(revision 61179)
+@@ -1,4 +1,4 @@
+-# Copyright 2001-2007 by Vinay Sajip. All Rights Reserved.
++# Copyright 2001-2005 by Vinay Sajip. All Rights Reserved.
+ #
+ # Permission to use, copy, modify, and distribute this software and its
+ # documentation for any purpose and without fee is hereby granted,
+@@ -22,7 +22,7 @@
+ Should work under Python versions >= 1.5.2, except that source line
+ information is not available unless 'sys._getframe()' is.
+ 
+-Copyright (C) 2001-2007 Vinay Sajip. All Rights Reserved.
++Copyright (C) 2001-2004 Vinay Sajip. All Rights Reserved.
+ 
+ To use, simply 'import logging' and log away!
+ """
+@@ -231,12 +231,12 @@
+             #         of days in the next week until the rollover day (3).
+             if when.startswith('W'):
+                 day = t[6] # 0 is Monday
+-                if day != self.dayOfWeek:
+-                    if day < self.dayOfWeek:
+-                        daysToWait = self.dayOfWeek - day - 1
+-                    else:
+-                        daysToWait = 6 - day + self.dayOfWeek
++                if day > self.dayOfWeek:
++                    daysToWait = (day - self.dayOfWeek) - 1
+                     self.rolloverAt = self.rolloverAt + (daysToWait * (60 * 60 * 24))
++                if day < self.dayOfWeek:
++                    daysToWait = (6 - self.dayOfWeek) + day
++                    self.rolloverAt = self.rolloverAt + (daysToWait * (60 * 60 * 24))
+ 
+         #print "Will rollover at %d, %d seconds from now" % (self.rolloverAt, self.rolloverAt - currentTime)
+ 
+@@ -566,8 +566,7 @@
+         """
+         Initialize a handler.
+ 
+-        If address is specified as a string, a UNIX socket is used. To log to a
+-        local syslogd, "SysLogHandler(address="/dev/log")" can be used.
++        If address is specified as a string, UNIX socket is used.
+         If facility is not specified, LOG_USER is used.
+         """
+         logging.Handler.__init__(self)
+@@ -575,11 +574,11 @@
+         self.address = address
+         self.facility = facility
+         if type(address) == types.StringType:
+-            self.unixsocket = 1
+             self._connect_unixsocket(address)
++            self.unixsocket = 1
+         else:
+-            self.unixsocket = 0
+             self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
++            self.unixsocket = 0
+ 
+         self.formatter = None
+ 
+Index: Lib/logging/config.py
+===================================================================
+--- Lib/logging/config.py	(revision 61178)
++++ Lib/logging/config.py	(revision 61179)
+@@ -78,7 +78,7 @@
+         flist = string.split(flist, ",")
+         formatters = {}
+         for form in flist:
+-            sectname = "formatter_%s" % string.strip(form)
++            sectname = "formatter_%s" % form
+             opts = cp.options(sectname)
+             if "format" in opts:
+                 fs = cp.get(sectname, "format", 1)
+@@ -97,7 +97,6 @@
+         try:
+             #first, lose the existing handlers...
+             logging._handlers.clear()
+-            del logging._handlerList[:]
+             #now set up the new ones...
+             hlist = cp.get("handlers", "keys")
+             if len(hlist):
+@@ -106,7 +105,7 @@
+                 fixups = [] #for inter-handler references
+                 for hand in hlist:
+                     try:
+-                        sectname = "handler_%s" % string.strip(hand)
++                        sectname = "handler_%s" % hand
+                         klass = cp.get(sectname, "class")
+                         opts = cp.options(sectname)
+                         if "formatter" in opts:
+@@ -141,7 +140,6 @@
+             #at last, the loggers...first the root...
+             llist = cp.get("loggers", "keys")
+             llist = string.split(llist, ",")
+-            llist = map(lambda x: string.strip(x), llist)
+             llist.remove("root")
+             sectname = "logger_root"
+             root = logging.root
+@@ -156,7 +154,7 @@
+             if len(hlist):
+                 hlist = string.split(hlist, ",")
+                 for hand in hlist:
+-                    log.addHandler(handlers[string.strip(hand)])
++                    log.addHandler(handlers[hand])
+             #and now the others...
+             #we don't want to lose the existing loggers,
+             #since other threads may have pointers to them.
+@@ -190,7 +188,7 @@
+                 if len(hlist):
+                     hlist = string.split(hlist, ",")
+                     for hand in hlist:
+-                        logger.addHandler(handlers[string.strip(hand)])
++                        logger.addHandler(handlers[hand])
+             #Disable any old loggers. There's no point deleting
+             #them as other threads may continue to hold references
+             #and by disabling them, you stop them doing any logging.
+Index: Lib/trace.py
+===================================================================
+--- Lib/trace.py	(revision 61178)
++++ Lib/trace.py	(revision 61179)
+@@ -583,7 +583,7 @@
+         """
+         if why == 'call':
+             code = frame.f_code
+-            filename = frame.f_globals.get('__file__', None)
++            filename = code.co_filename
+             if filename:
+                 # XXX modname() doesn't work right for packages, so
+                 # the ignore support won't work right for packages
+Index: Lib/subprocess.py
+===================================================================
+--- Lib/subprocess.py	(revision 61178)
++++ Lib/subprocess.py	(revision 61179)
+@@ -346,7 +346,6 @@
+ import os
+ import types
+ import traceback
+-import gc
+ 
+ if mswindows:
+     import threading
+@@ -900,16 +899,7 @@
+             errpipe_read, errpipe_write = os.pipe()
+             self._set_cloexec_flag(errpipe_write)
+ 
+-            gc_was_enabled = gc.isenabled()
+-            # Disable gc to avoid bug where gc -> file_dealloc ->
+-            # write to stderr -> hang.  http://bugs.python.org/issue1336
+-            gc.disable()
+-            try:
+-                self.pid = os.fork()
+-            except:
+-                if gc_was_enabled:
+-                    gc.enable()
+-                raise
++            self.pid = os.fork()
+             if self.pid == 0:
+                 # Child
+                 try:
+@@ -968,8 +958,6 @@
+                 os._exit(255)
+ 
+             # Parent
+-            if gc_was_enabled:
+-                gc.enable()
+             os.close(errpipe_write)
+             if p2cread and p2cwrite:
+                 os.close(p2cread)
+Index: Lib/test/test_gdbm.py
+===================================================================
+--- Lib/test/test_gdbm.py	(revision 61178)
++++ Lib/test/test_gdbm.py	(revision 61179)
+@@ -5,9 +5,9 @@
+ 
+ import gdbm
+ from gdbm import error
+-from test.test_support import verbose, verify, TestFailed, TESTFN
++from test.test_support import verbose, verify, TestFailed
+ 
+-filename = TESTFN
++filename= '/tmp/delete_me'
+ 
+ g = gdbm.open(filename, 'c')
+ verify(g.keys() == [])
+Index: Lib/test/test_sha.py
+===================================================================
+--- Lib/test/test_sha.py	(revision 61178)
++++ Lib/test/test_sha.py	(revision 61179)
+@@ -11,23 +11,9 @@
+ 
+ class SHATestCase(unittest.TestCase):
+     def check(self, data, digest):
+-        # Check digest matches the expected value
+-        obj = sha.new(data)
+-        computed = obj.hexdigest()
++        computed = sha.new(data).hexdigest()
+         self.assert_(computed == digest)
+ 
+-        # Verify that the value doesn't change between two consecutive
+-        # digest operations.
+-        computed_again = obj.hexdigest()
+-        self.assert_(computed == computed_again)
+-
+-        # Check hexdigest() output matches digest()'s output
+-        digest = obj.digest()
+-        hexd = ""
+-        for c in digest:
+-            hexd += '%02x' % ord(c)
+-        self.assert_(computed == hexd)
+-
+     def test_case_1(self):
+         self.check("abc",
+                    "a9993e364706816aba3e25717850c26c9cd0d89d")
+@@ -40,9 +26,6 @@
+         self.check("a" * 1000000,
+                    "34aa973cd4c4daa4f61eeb2bdbad27316534016f")
+ 
+-    def test_case_4(self):
+-        self.check(chr(0xAA) * 80,
+-                   '4ca0ef38f1794b28a8f8ee110ee79d48ce13be25')
+ 
+ def test_main():
+     test_support.run_unittest(SHATestCase)
+Index: Lib/test/test_dbm.py
+===================================================================
+--- Lib/test/test_dbm.py	(revision 61178)
++++ Lib/test/test_dbm.py	(revision 61179)
+@@ -6,11 +6,11 @@
+ import random
+ import dbm
+ from dbm import error
+-from test.test_support import verbose, verify, TestSkipped, TESTFN
++from test.test_support import verbose, verify, TestSkipped
+ 
+ # make filename unique to allow multiple concurrent tests
+ # and to minimize the likelihood of a problem from an old file
+-filename = TESTFN
++filename = '/tmp/delete_me_' + str(random.random())[-6:]
+ 
+ def cleanup():
+     for suffix in ['', '.pag', '.dir', '.db']:
+Index: Lib/test/test_multibytecodec.py
+===================================================================
+--- Lib/test/test_multibytecodec.py	(revision 61178)
++++ Lib/test/test_multibytecodec.py	(revision 61179)
+@@ -7,20 +7,8 @@
+ 
+ from test import test_support
+ from test import test_multibytecodec_support
+-from test.test_support import TESTFN
+-import unittest, StringIO, codecs, sys, os
++import unittest, StringIO, codecs, sys
+ 
+-class Test_StreamReader(unittest.TestCase):
+-    def test_bug1728403(self):
+-        try:
+-            open(TESTFN, 'w').write('\xa1')
+-            f = codecs.open(TESTFN, encoding='cp949')
+-            self.assertRaises(UnicodeDecodeError, f.read, 2)
+-        finally:
+-            try: f.close()
+-            except: pass
+-            os.unlink(TESTFN)
+-
+ class Test_StreamWriter(unittest.TestCase):
+     if len(u'\U00012345') == 2: # UCS2
+         def test_gb18030(self):
+@@ -111,7 +99,6 @@
+ 
+ def test_main():
+     suite = unittest.TestSuite()
+-    suite.addTest(unittest.makeSuite(Test_StreamReader))
+     suite.addTest(unittest.makeSuite(Test_StreamWriter))
+     suite.addTest(unittest.makeSuite(Test_ISO2022))
+     test_support.run_suite(suite)
+Index: Lib/uu.py
+===================================================================
+--- Lib/uu.py	(revision 61178)
++++ Lib/uu.py	(revision 61179)
+@@ -115,7 +115,6 @@
+     #
+     # Open the output file
+     #
+-    opened = False
+     if out_file == '-':
+         out_file = sys.stdout
+     elif isinstance(out_file, StringType):
+@@ -125,7 +124,6 @@
+         except AttributeError:
+             pass
+         out_file = fp
+-        opened = True
+     #
+     # Main decoding loop
+     #
+@@ -143,8 +141,6 @@
+         s = in_file.readline()
+     if not s:
+         raise Error, 'Truncated input file'
+-    if opened:
+-        out_file.close()
+ 
+ def test():
+     """uuencode/uudecode main program"""
+Index: Modules/cjkcodecs/multibytecodec.c
+===================================================================
+--- Modules/cjkcodecs/multibytecodec.c	(revision 61178)
++++ Modules/cjkcodecs/multibytecodec.c	(revision 61179)
+@@ -705,8 +705,6 @@
+ 	cres = NULL;
+ 
+ 	for (;;) {
+-		int endoffile;
+-
+ 		if (sizehint < 0)
+ 			cres = PyObject_CallMethod(self->stream,
+ 					(char *)method, NULL);
+@@ -723,8 +721,6 @@
+ 			goto errorexit;
+ 		}
+ 
+-		endoffile = (PyString_GET_SIZE(cres) == 0);
+-
+ 		if (self->pendingsize > 0) {
+ 			PyObject *ctr;
+ 			char *ctrdata;
+@@ -776,7 +772,7 @@
+ 					goto errorexit;
+ 			}
+ 
+-		if (endoffile || sizehint < 0) { /* end of file */
++		if (rsize == 0 || sizehint < 0) { /* end of file */
+ 			if (buf.inbuf < buf.inbuf_end &&
+ 			    multibytecodec_decerror(self->codec, &self->state,
+ 					&buf, self->errors, MBERR_TOOFEW))

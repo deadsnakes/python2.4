@@ -1,0 +1,15 @@
+#! /bin/sh
+
+if [ -x /usr/sbin/install-info ]; then
+    install-info --quiet --remove /usr/share/info/@PVER@-lib.info
+    #install-info --quiet --remove /usr/share/info/@PVER@-mac.info
+    install-info --quiet --remove /usr/share/info/@PVER@-ref.info
+    install-info --quiet --remove /usr/share/info/@PVER@-api.info
+    install-info --quiet --remove /usr/share/info/@PVER@-ext.info
+    install-info --quiet --remove /usr/share/info/@PVER@-tut.info
+    install-info --quiet --remove /usr/share/info/@PVER@-dist.info
+fi
+
+#DEBHELPER#
+
+exit 0

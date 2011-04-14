@@ -1,0 +1,44 @@
+#! /bin/sh -e
+
+# DP: test_sundry: Don't fail on import of the profile and pstats module
+
+dir=
+if [ $# -eq 3 -a "$2" = '-d' ]; then
+    pdir="-d $3"
+    dir="$3/"
+elif [ $# -ne 1 ]; then
+    echo >&2 "usage: `basename $0`: -patch|-unpatch [-d <srcdir>]"
+    exit 1
+fi
+case "$1" in
+    -patch)
+        patch $pdir -f --no-backup-if-mismatch -p0 < $0
+        #cd ${dir}gcc && autoconf
+        ;;
+    -unpatch)
+        patch $pdir -f --no-backup-if-mismatch -R -p0 < $0
+        #rm ${dir}gcc/configure
+        ;;
+    *)
+	echo >&2 "usage: `basename $0`: -patch|-unpatch [-d <srcdir>]"
+        exit 1
+esac
+exit 0
+
+--- Lib/test/test_sundry.py~	2004-06-02 19:40:14.000000000 +0200
++++ Lib/test/test_sundry.py	2005-03-18 15:09:00.381660040 +0100
+@@ -62,8 +62,12 @@
+ import pipes
+ #import poplib
+ import posixfile
+-import profile
+-import pstats
++try:
++    import profile	# separated out into the python-profiler package
++    import pstats
++except ImportError:
++    if verbose:
++        print "skipping profile and pstats"
+ import py_compile
+ #import reconvert
+ import repr
