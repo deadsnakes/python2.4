@@ -32,8 +32,8 @@ diff --git a/setup.py b/setup.py
          lib_dirs = self.compiler.library_dirs + [
              '/lib64', '/usr/lib64',
              '/lib', '/usr/lib',
-+            '/lib/%s' % os.getenv('DEB_BUILD_GNU_TYPE'),
-+            '/usr/lib/%s' % os.getenv('DEB_BUILD_GNU_TYPE'),
++            '/lib/%s' % os.getenv('DEB_BUILD_MULTIARCH'),
++            '/usr/lib/%s' % os.getenv('DEB_BUILD_MULTIARCH'),
              ]
          inc_dirs = self.compiler.include_dirs + ['/usr/include']
          exts = []

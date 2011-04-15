@@ -32,7 +32,7 @@ export PVER=python2.4
 export PRIORITY=$(shell echo $(VER) | tr -d '.')0
 
 # For setup.py to feast upon.
-export DEB_BUILD_GNU_TYPE=$(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+export DEB_BUILD_MULTIARCH=$(shell dpkg-architecture -qDEB_BUILD_MULTIARCH)
 
 PREVVER	:= $(shell awk '/^python/ && NR > 1 {print substr($$2,2,length($$2)-2); exit}' debian/changelog)
 
