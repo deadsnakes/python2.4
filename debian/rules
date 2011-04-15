@@ -31,6 +31,9 @@ export NVER=2.5
 export PVER=python2.4
 export PRIORITY=$(shell echo $(VER) | tr -d '.')0
 
+# For setup.py to feast upon.
+export DEB_BUILD_GNU_TYPE=$(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
 PREVVER	:= $(shell awk '/^python/ && NR > 1 {print substr($$2,2,length($$2)-2); exit}' debian/changelog)
 
 # default versions are built from the python-defaults source package
@@ -866,7 +869,7 @@ debian_patches = \
 	debug-build \
 	strxfrm-leak \
 	db4.6 \
-	emacs22-build \
+	emacs23-build \
 	gcc-fwrapv \
 	issue961805 \
 	signal.set_wakeup_fd \
@@ -876,6 +879,7 @@ debian_patches = \
 	platform-lsbrelease \
 	CVE-2009-3720 \
 	CVE-2009-3560 \
+	natty-search-new-library-dirs \
 
 ifeq ($(with_fpectl),yes)
   debian_patches += \

@@ -1,3 +1,12 @@
+python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa7~natty1) natty; urgency=low
+
+  * Imported from Maverick.
+  * Made documentation build with emacs23 since emacs22 isn't in Natty anymore.
+  * Add new Natty library directories to library search path so libraries in
+    there are actually found.
+
+ -- Felix Krull <f_krull@gmx.de>  Fri, 15 Apr 2011 18:11:44 +0200
+
 python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa7~maverick1) maverick; urgency=low
 
   * Fix documentation build.
