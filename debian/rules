@@ -876,6 +876,7 @@ debian_patches = \
 	platform-lsbrelease \
 	CVE-2009-3720 \
 	CVE-2009-3560 \
+	deadsnakes-add-profile-pstats \
 
 ifeq ($(with_fpectl),yes)
   debian_patches += \
