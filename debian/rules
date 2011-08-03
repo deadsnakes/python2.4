@@ -457,6 +457,7 @@ ifeq ($(with_interp),static)
 endif
 	ln -sf libpython$(VER).so.1.0 $(d)/usr/lib/libpython$(VER).so.1
 	ln -sf libpython$(VER).so.1 $(d)/usr/lib/libpython$(VER).so
+	mkdir -p $(d)/usr/lib/python$(VER)/config
 	ln -sf ../../libpython$(VER).so \
 		$(d)/usr/lib/python$(VER)/config/libpython$(VER).so
 
