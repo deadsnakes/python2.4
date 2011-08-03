@@ -125,7 +125,7 @@ Package: @PVER@-tk-deadsnakes-dbg
 Architecture: any
 Priority: extra
 Section: debug
-Depends: @PVER@, ${python:Depends}, @PVER@-tk-deadsnakes (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}a
+Depends: @PVER@, ${python:Depends}, @PVER@-tk-deadsnakes (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: python-tk-deadsnakes-dbg
 Replaces: python-tk-deadsnakes-dbg
 Description: Tkinter - Writing Tk applications with Python (v@VER@ debug extension)

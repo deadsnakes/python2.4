@@ -125,7 +125,7 @@ Package: python2.4-tk-deadsnakes-dbg
 Architecture: any
 Priority: extra
 Section: debug
-Depends: python2.4, ${python:Depends}, python2.4-tk-deadsnakes (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}a
+Depends: python2.4, ${python:Depends}, python2.4-tk-deadsnakes (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: python-tk-deadsnakes-dbg
 Replaces: python-tk-deadsnakes-dbg
 Description: Tkinter - Writing Tk applications with Python (v2.4 debug extension)
