@@ -15,7 +15,7 @@ Architecture: any
 Priority: @PRIO@
 Depends: @PVER@-minimal (= ${binary:Version}), mime-support, ${shlibs:Depends}
 Suggests: @PVER@-doc, @PVER@-profiler
-Provides: python@VER@-cjkcodecs, @PVER@-plist
+Provides: python@VER@-cjkcodecs, @PVER@-plist, @PVER@-profiler
 Replaces: @PVER@-minimal (<< 2.4-3), @PVER@-dev (<= 2.4.4-4), idle-@PVER@ (<< 2.4.3-8), python-tk (<< 2.4.3-2)
 Conflicts: @PVER@-dev (<< 2.3.95-2), python-central (<< 0.5), idle-@PVER@ (<< 2.4.3-8), python-tk (<< 2.4.3-2)
 XB-Python-Version: @VER@
