@@ -457,6 +457,7 @@ ifeq ($(with_interp),static)
 endif
 	ln -sf libpython$(VER).so.1.0 $(d)/usr/lib/libpython$(VER).so.1
 	ln -sf libpython$(VER).so.1 $(d)/usr/lib/libpython$(VER).so
+	mkdir -p $(d)/usr/lib/python$(VER)/config
 	ln -sf ../../libpython$(VER).so \
 		$(d)/usr/lib/python$(VER)/config/libpython$(VER).so
 
@@ -759,7 +760,6 @@ endif
 	dh_installdebconf -i $(dh_args)
 	dh_installexamples -i $(dh_args)
 	dh_installmenu -i $(dh_args)
-	dh_desktop -i $(dh_args)
 	-dh_icons -i $(dh_args) || dh_iconcache -i $(dh_args)
 	dh_installchangelogs -i $(dh_args)
 	dh_link -i $(dh_args)
@@ -789,7 +789,6 @@ binary-arch: build install
 #	dh_installdebconf -a
 	dh_installexamples -a
 	dh_installmenu -a
-	dh_desktop -a
 	-dh_icons -a || dh_iconcache -a
 #	dh_installmime -a
 	dh_installinfo -a
@@ -876,6 +875,8 @@ debian_patches = \
 	platform-lsbrelease \
 	CVE-2009-3720 \
 	CVE-2009-3560 \
+	deadsnakes-add-profile-pstats \
+	deadsnakes-fix-debug-ext \
 
 ifeq ($(with_fpectl),yes)
   debian_patches += \
