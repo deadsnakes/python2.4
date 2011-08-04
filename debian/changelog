@@ -1,3 +1,9 @@
+python2.4 (2.4.6-2~ppa8~maverick1) maverick; urgency=low
+
+  * Imported from Lucid package.
+
+ -- Felix Krull <f_krull@gmx.de>  Thu, 04 Aug 2011 20:18:49 +0200
+
 python2.4 (2.4.6-2~ppa8~lucid1) lucid; urgency=low
 
   * Added `profile` and `pstats` modules.
