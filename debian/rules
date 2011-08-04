@@ -760,7 +760,6 @@ endif
 	dh_installdebconf -i $(dh_args)
 	dh_installexamples -i $(dh_args)
 	dh_installmenu -i $(dh_args)
-	dh_desktop -i $(dh_args)
 	-dh_icons -i $(dh_args) || dh_iconcache -i $(dh_args)
 	dh_installchangelogs -i $(dh_args)
 	dh_link -i $(dh_args)
@@ -790,7 +789,6 @@ binary-arch: build install
 #	dh_installdebconf -a
 	dh_installexamples -a
 	dh_installmenu -a
-	dh_desktop -a
 	-dh_icons -a || dh_iconcache -a
 #	dh_installmime -a
 	dh_installinfo -a
