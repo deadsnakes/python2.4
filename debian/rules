@@ -877,7 +877,7 @@ debian_patches = \
 	platform-lsbrelease \
 	CVE-2009-3720 \
 	CVE-2009-3560 \
-	natty-search-new-library-dirs \
+	deadsnakes-natty-search-new-library-dirs \
 	deadsnakes-add-profile-pstats \
 	deadsnakes-fix-debug-ext \
 
