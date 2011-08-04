@@ -878,6 +878,7 @@ debian_patches = \
 	CVE-2009-3720 \
 	CVE-2009-3560 \
 	deadsnakes-add-profile-pstats \
+	deadsnakes-fix-debug-ext \
 
 ifeq ($(with_fpectl),yes)
   debian_patches += \
