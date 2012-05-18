@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 5), autoconf, libreadline-dev, libncursesw5-dev (>=
 Build-Depends-Indep: libhtml-tree-perl, texlive-latex-recommended, texinfo, emacs23, debiandoc-sgml, sharutils, latex2html, python
 Build-Conflicts: tcl8.3-dev, tk8.3-dev, python2.4-xml, python-xml
 XS-Python-Version: 2.4
-Standards-Version: 3.9.1
+Standards-Version: 3.9.3
 Homepage: http://python.org/
 
 Package: python2.4
