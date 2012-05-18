@@ -1,3 +1,9 @@
+python2.4 (2.4.6-3+oneiric1) oneiric; urgency=low
+
+  * Imported from Natty package.
+
+ -- Felix Krull <f_krull@gmx.de>  Fri, 18 May 2012 18:29:41 +0200
+
 python2.4 (2.4.6-2~ppa9~natty1) natty; urgency=low
 
   * Imported from Lucid package.
