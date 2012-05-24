@@ -18,13 +18,24 @@ changelog_values := $(shell dpkg-parsechangelog \
 PKGSOURCE  := $(word 1, $(changelog_values))
 PKGVERSION := $(word 2, $(changelog_values))
 
+on_buildd := $(shell [ -f /CurrentlyBuilding -o "$$LOGNAME" = buildd ] && echo yes)
+
 ifneq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
   WITHOUT_CHECK := yes
 endif
-  WITHOUT_CHECK := yes
+ifeq ($(on_buildd),yes)
+  ifneq (,$(findstring $(DEB_BUILD_ARCH), hppa))
+    WITHOUT_CHECK := yes
+  endif
+endif
 
-#distribution := $(shell lsb_release -is)
-distribution := Ubuntu-PPA
+COMMA = ,
+ifneq (,$(filter parallel=%,$(subst $(COMMA), ,$(DEB_BUILD_OPTIONS))))
+  NJOBS := -j $(subst parallel=,,$(filter parallel=%,$(subst $(COMMA), ,$(DEB_BUILD_OPTIONS))))
+endif
+
+distribution := $(shell lsb_release -is)
+#distribution := Ubuntu
 
 export VER=2.4
 export NVER=2.5
@@ -83,6 +94,10 @@ else
 endif
 
 CC = gcc
+ifneq ($(CC),gcc)
+  GCCBDEP =, gcc-4.1
+  GCCDEP =, $(CC)
+endif
 
 # on alpha, use -O2 only, use -mieee
 ifeq ($(DEB_BUILD_ARCH),alpha)
@@ -105,8 +120,9 @@ scriptdir	=  usr/lib/python$(VER)
 # package names and directories
 p_base	:= $(PVER)
 p_min	:= $(PVER)-minimal
-p_tk	:= $(PVER)-tk-deadsnakes
-p_gdbm	:= $(PVER)-gdbm-deadsnakes
+p_lib	:= lib$(PVER)
+p_tk	:= $(PVER)-tk
+p_gdbm	:= $(PVER)-gdbm
 p_tk_dbg := $(p_tk)-dbg
 p_gdbm_dbg := $(p_gdbm)-dbg
 p_dev	:= $(PVER)-dev
@@ -114,9 +130,11 @@ p_exam	:= $(PVER)-examples
 p_idle	:= idle-$(PVER)
 p_doc	:= $(PVER)-doc
 p_dbg	:= $(PVER)-dbg
+lib_p   := lib$(PVER)
 
 d_base	:= debian/$(p_base)
 d_min	:= debian/$(p_min)
+d_lib	:= debian/$(p_lib)
 d_tk	:= debian/$(p_tk)
 d_gdbm	:= debian/$(p_gdbm)
 d_tk_dbg := debian/$(p_tk_dbg)
@@ -128,30 +146,32 @@ d_doc	:= debian/$(p_doc)
 d_dbg	:= debian/$(p_dbg)
 
 build: $(build_target)
-build-all: stamp-build
-stamp-build: stamp-build-static stamp-build-shared stamp-build-debug stamp-mincheck stamp-check stamp-pystone
-	touch stamp-build
+build-all: build-arch build-indep
+build-indep: stamps/stamp-build
+build-arch: stamps/stamp-build
+stamps/stamp-build: stamps/stamp-build-static stamps/stamp-build-shared stamps/stamp-build-debug stamps/stamp-mincheck stamps/stamp-check stamps/stamp-pystone stamps/stamp-pybench $(doc_dependencies)
+	touch stamps/stamp-build
 
-stamp-build-static: stamp-configure-static
+stamps/stamp-build-static: stamps/stamp-configure-static
 	dh_testdir
-	$(MAKE) -C $(buildd_static)
-	touch stamp-build-static
+	$(MAKE) $(NJOBS) -C $(buildd_static)
+	touch stamps/stamp-build-static
 
-stamp-build-shared: stamp-configure-shared
+stamps/stamp-build-shared: stamps/stamp-configure-shared
 	dh_testdir
-	$(MAKE) -C $(buildd_shared)
+	$(MAKE) $(NJOBS) -C $(buildd_shared)
 #	: # build the shared library
-#	$(MAKE) -C $(buildd_shared) \
+#	$(MAKE) $(NJOBS) -C $(buildd_shared) \
 #		libpython$(VER).so
 	: # build a static library with PIC objects
-	$(MAKE) -C $(buildd_shared) \
+	$(MAKE) $(NJOBS) -C $(buildd_shared) \
 		LIBRARY=libpython$(VER)-pic.a libpython$(VER)-pic.a
-	touch stamp-build-shared
+	touch stamps/stamp-build-shared
 
-stamp-build-debug: stamp-configure-debug
+stamps/stamp-build-debug: stamps/stamp-configure-debug
 	dh_testdir
-	$(MAKE) -C $(buildd_debug)
-	touch stamp-build-debug
+	$(MAKE) $(NJOBS) -C $(buildd_debug)
+	touch stamps/stamp-build-debug
 
 common_configure_args = \
 		--prefix=/usr \
@@ -164,8 +184,8 @@ ifeq ($(with_fpectl),yes)
 		--with-fpectl
 endif
 
-stamp-configure-shared: patch-stamp
-	rm -rf $(buildd_shared)
+stamps/stamp-configure-shared: stamps/stamp-configure
+	rm -rf $(buildd_shared) stamps/stamp-build-shared
 	mkdir -p $(buildd_shared)
 	cd $(buildd_shared) && \
 	  CC="$(CC)" $(OPTSETTINGS) \
@@ -173,10 +193,11 @@ stamp-configure-shared: patch-stamp
 		--enable-shared \
 		$(common_configure_args)
 
-	touch stamp-configure-shared
+	touch stamps/stamp-configure-shared
 
-stamp-configure-static: patch-stamp
-	rm -rf $(buildd_static)
+stamps/stamp-configure-static: stamps/stamp-configure
+	rm -rf $(buildd_static) stamps/stamp-build-static stamps/stamp-mincheck \
+	  stamps/stamp-check stamps/stamp-pystone stamps/stamp-pybench
 	mkdir -p $(buildd_static)
 	cd $(buildd_static) && \
 	  CC="$(CC)" $(OPTSETTINGS) \
@@ -189,10 +210,10 @@ stamp-configure-static: patch-stamp
 	touch -r $(buildd_static)/pyconfig.h $(buildd_static)/pyconfig.h.new
 	mv -f $(buildd_static)/pyconfig.h.new $(buildd_static)/pyconfig.h
 
-	touch stamp-configure-static
+	touch stamps/stamp-configure-static
 
-stamp-configure-debug: patch-stamp
-	rm -rf $(buildd_debug)
+stamps/stamp-configure-debug: stamps/stamp-configure
+	rm -rf $(buildd_debug) stamps/stamp-build-debug
 	mkdir -p $(buildd_debug)
 	cd $(buildd_debug) && \
 	  CC="$(CC)" $(OPTDEBUGSETTINGS) \
@@ -206,9 +227,9 @@ stamp-configure-debug: patch-stamp
 	touch -r $(buildd_debug)/pyconfig.h $(buildd_debug)/pyconfig.h.new
 	mv -f $(buildd_debug)/pyconfig.h.new $(buildd_debug)/pyconfig.h
 
-	touch stamp-configure-debug
+	touch stamps/stamp-configure-debug
 
-stamp-mincheck:
+stamps/stamp-mincheck:
 	for m in $(MIN_MODS) $(MIN_EXTS) $(MIN_BUILTINS); do \
 	  echo "import $$m"; \
 	done > $(buildd_static)/minmods.py
@@ -222,27 +243,52 @@ stamp-mincheck:
 	else true; fi
 	cd $(buildd_static) && ./python ../debian/mincheck.py \
 		minmods.py mindeps.txt
-	touch stamp-mincheck
+	touch stamps/stamp-mincheck
 
-on_buildd := $(shell [ -f /CurrentlyBuilding -o "$$LOGNAME" = buildd ] && echo yes)
 TEST_RESOURCES = all
 ifeq ($(on_buildd),yes)
-  TEST_RESOURCES := $(TEST_RESOURCES),-network
+  TEST_RESOURCES := $(TEST_RESOURCES),-network,-urlfetch
 endif
 TESTOPTS = -w -l -u$(TEST_RESOURCES)
+TEST_EXCLUDES =
 ifeq ($(on_buildd),yes)
-  TESTOPTS += -x test_tcl
+  TEST_EXCLUDES += test_tcl test_codecmaps_cn test_codecmaps_hk \
+        test_codecmaps_jp test_codecmaps_kr test_codecmaps_tw \
+        test_normalization test_ossaudiodev
+endif
+ifneq (,$(filter $(DEB_BUILD_ARCH), hppa))
+  TEST_EXCLUDES += test_fork1 test_wait3 test_wait4
+endif
+ifneq (,$(filter $(DEB_BUILD_ARCH), arm avr))
+  TEST_EXCLUDES += test_ctypes
+endif
+ifneq (,$(filter $(DEB_BUILD_ARCH), avr m68k))
+  TEST_EXCLUDES += test_bsddb3
+endif
+ifneq (,$(filter $(DEB_BUILD_ARCH), arm armel avr m68k))
+  TEST_EXCLUDES += test_compiler
+endif
+ifneq (,$(filter $(DEB_BUILD_ARCH), i386))
+  TEST_EXCLUDES += test_threading
+endif
+ifneq (,$(TEST_EXCLUDES))
+  TESTOPTS += -x $(TEST_EXCLUDES)
 endif
 
-stamp-check:
+ifneq (,$(wildcard /usr/bin/localedef))
+  SET_LOCPATH = LOCPATH=$(CURDIR)/locales
+endif
+
+stamps/stamp-check:
 ifeq ($(WITHOUT_CHECK),yes)
 	echo "check run disabled for this build" > $(buildd_static)/test_results
 else
 	: # build locales needed by the testsuite
 	rm -rf locales
 	mkdir locales
-	chmod +x debian/locale-gen
-	debian/locale-gen
+	if which localedef >/dev/null 2>&1; then \
+	  sh debian/locale-gen; \
+	fi
 
 	@echo ========== test environment ============
 	@env
@@ -262,6 +308,7 @@ else
 	    TESTOPTS="$(TESTOPTS)" 2>&1 \
 	    | tee $(buildd_shared)/test_results
 	@echo "END test shared"
+  ifeq (,$(findstring $(DEB_BUILD_ARCH), alpha))
 	@echo "BEGIN test debug"
 	-time \
 	  LOCPATH=$(CURDIR)/locales \
@@ -269,11 +316,12 @@ else
 	    TESTOPTS="$(TESTOPTS)" 2>&1 \
 	    | tee $(buildd_debug)/test_results
 	@echo "END test debug"
+  endif
 endif
 	cp -p $(buildd_static)/test_results debian/
-	touch stamp-check
+	touch stamps/stamp-check
 
-stamp-pystone:
+stamps/stamp-pystone:
 	@echo "BEGIN pystone static"
 	cd $(buildd_static) && ./python ../Lib/test/pystone.py
 	cd $(buildd_static) && ./python ../Lib/test/pystone.py
@@ -288,7 +336,47 @@ stamp-pystone:
 	cd $(buildd_debug) && ./python ../Lib/test/pystone.py
 	cd $(buildd_debug) && ./python ../Lib/test/pystone.py
 	@echo "END pystone debug"
-	touch stamp-pystone
+	touch stamps/stamp-pystone
+
+#ifeq (,$(filter $(DEB_BUILD_ARCH), arm armel avr hppa mips mipsel m68k))
+  pybench_options = -C 2 -n 5 -w 4
+#endif
+
+stamps/stamp-pybench:
+ifeq ($(WITHOUT_CHECK),yes)
+	echo "pybench run disabled for this build" > $(buildd_static)/pybench.log
+else
+  ifeq (,$(filter $(DEB_BUILD_ARCH), arm armel avr hppa m68k))
+	@echo "BEGIN pybench static"
+	cd $(buildd_static) \
+	  && time ./python ../Tools/pybench/pybench.py -f run1.pybench $(pybench_options)
+	cd $(buildd_static) \
+	  && ./python ../Tools/pybench/pybench.py -f run2.pybench -c run1.pybench $(pybench_options)
+	@echo "END pybench static"
+	@echo "BEGIN pybench shared"
+	cd $(buildd_shared) \
+	  && LD_LIBRARY_PATH=. ./python ../Tools/pybench/pybench.py -f run1.pybench $(pybench_options)
+	cd $(buildd_shared) \
+	  && LD_LIBRARY_PATH=. ./python ../Tools/pybench/pybench.py -f run2.pybench -c run1.pybench $(pybench_options)
+	@echo "END pybench shared"
+    ifeq (,$(filter $(DEB_BUILD_ARCH), arm armel avr m68k))
+	@echo "BEGIN pybench debug"
+	cd $(buildd_debug) \
+	  && time ./python ../Tools/pybench/pybench.py -f run1.pybench $(pybench_options)
+	cd $(buildd_debug) \
+	  && ./python ../Tools/pybench/pybench.py -f run2.pybench -c run1.pybench $(pybench_options)
+	@echo "END pybench debug"
+    endif
+	@echo "BEGIN shared/static comparision"
+	$(buildd_static)/python Tools/pybench/pybench.py \
+	  -s $(buildd_static)/run2.pybench -c $(buildd_shared)/run2.pybench \
+	  | tee $(buildd_static)/pybench.log
+	@echo "END shared/static comparision"
+  else
+	echo "pybench not run on arch $(DEB_BUILD_ARCH)." > $(buildd_static)/pybench.log
+  endif
+endif
+	touch stamps/stamp-pybench
 
 minimal-test:
 	rm -rf mintest
@@ -315,45 +403,22 @@ minimal-test:
 		test_codecencodings_jp test_codecencodings_kr \
 		test_codecencodings_tw test_codecs test_multibytecodec \
 
-stamp-doc-html:
+stamps/stamp-doc-html:
 	dh_testdir
 	LD_LIBRARY_PATH=$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(buildd_static) \
 	    $(MAKE) -C Doc tarhtml \
 		PYTHON=$(python_for_doc) \
 		MKHOWTO='TEXINPUTS=$$(TEXINPUTS) $$(PYTHON) $$(CURDIR)/tools/mkhowto'
-	touch stamp-doc-html
+	touch stamps/stamp-doc-html
 
-stamp-doc-info:
+stamps/stamp-doc-info:
 	dh_testdir
-	patch -p0 < debian/patches/libre.diff
 	$(MAKE) -C Doc/info VERSION=$(VER)
-	patch -R -p0 < debian/patches/libre.diff
-	touch stamp-doc-info
+	touch stamps/stamp-doc-info
 
-build-doc: patch-stamp stamp-build-doc
-stamp-build-doc: stamp-doc-html stamp-doc-info
-	touch stamp-build-doc
-
-#update-doc:
-#ifeq ($(distribution),Ubuntu)
-#	: # copy just build docs to debian/patches
-#	tar cfj - Doc/html-*.tar Doc/info/*.info* \
-#	    | uuencode -m docs.tar.bz2 > debian/patches/docs.uue
-##	tar cfj - Doc/html-*.tar \
-##	    | uuencode -m docs.tar.bz2 > debian/patches/docs.uue
-#endif
-#
-#stamp-unpack-doc:
-#	uudecode debian/patches/docs.uue
-#	tar xfj docs.tar.bz2
-#	rm -f docs.tar.bz2
-#	touch stamp-unpack-doc
-#
-ifneq (,$(findstring -doc, $(PKGSOURCE)))
-  control_files = debian/control.doc
-else
-  control_files = debian/control.in
-endif
+build-doc: stamps/stamp-configure stamps/stamp-build-doc
+stamps/stamp-build-doc: stamps/stamp-doc-html stamps/stamp-doc-info
+	touch stamps/stamp-build-doc
 
 control-file:
 	sed -e "s/@PVER@/$(PVER)/g" \
@@ -361,7 +426,7 @@ control-file:
 	    -e "s/@PYSTDDEP@/$(PYSTDDEP)/g" \
 	    -e "s/@PRIO@/$(PY_PRIO)/g" \
 	    -e "s/@MINPRIO@/$(PY_MINPRIO)/g" \
-		$(control_files) > debian/control.tmp
+		debian/control.in > debian/control.tmp
 ifeq ($(distribution),Ubuntu)
   ifneq (,$(findstring ubuntu, $(PKGVERSION)))
 	m='Ubuntu Core Developers <ubuntu-devel-discuss@lists.ubuntu.com>'; \
@@ -379,9 +444,8 @@ endif
 clean: control-file
 	dh_testdir
 	dh_testroot
-	$(MAKE) -f debian/rules unpatch
-	rm -f stamp-*
-	rm -f patch-stamp* pxxx
+	rm -rf stamps
+	rm -f pxxx
 	rm -f debian/test_results
 
 	$(MAKE) -C Doc PYTHON=$(python_for_doc) realclean
@@ -391,8 +455,9 @@ clean: control-file
 	-$(MAKE) -f Makefile.pre.in srcdir=. distclean
 	rm -rf Lib/test/db_home
 	rm -rf $(buildd_static) $(buildd_shared) $(buildd_debug)
-	find -name '*.py[co]' | xargs -r rm -f
+	-find -name '*.py[co]' | xargs -n 50 rm -f
 	rm -rf locales
+	rm -rf $(d)-dbg
 
 	for f in debian/*.in; do \
 	    f2=`echo $$f | sed "s,PVER,$(PVER),g;s/@VER@/$(VER)/g;s,\.in$$,,"`; \
@@ -402,7 +467,7 @@ clean: control-file
 	done
 	dh_clean
 
-stamp-control:
+stamps/stamp-control:
 	: # We have to prepare the various control files
 
 	for f in debian/*.in; do \
@@ -416,8 +481,8 @@ stamp-control:
 	    fi; \
 	done
 
-install: $(build_target) stamp-install
-stamp-install: stamp-build control-file stamp-control
+install: $(build_target) stamps/stamp-install
+stamps/stamp-install: stamps/stamp-build control-file stamps/stamp-control
 	dh_testdir
 	dh_testroot
 	dh_clean -k
@@ -437,7 +502,7 @@ endif
 	: # add additional files
 	cp -p Lib/plat-mac/plistlib.py $(d)/usr/lib/python$(VER)/
 
-	: # remove files, which are not packaged
+	: # remove files which are not packaged
 	rm -f $(d)/usr/bin/smtpd.py
 
 	: # move manpages to new names
@@ -454,9 +519,16 @@ endif
 	ln -sf ../lib/python$(VER)/pdb.py $(d)/usr/bin/pdb$(VER)
 	cp -p debian/pdb.1 $(d)/usr/share/man/man1/pdb$(VER).1
 
+	: # versioned install only
+	rm -f $(d)/usr/bin/python-config
+
 ifeq ($(with_interp),static)
 	: # install the shared library
 	cp -p $(buildd_shared)/libpython$(VER).so.1.0 $(d)/usr/lib/
+endif
+ifeq ($(with_interp),shared)
+	: # install the statically linked runtime
+	install -m755 $(buildd_static)/python $(d)/usr/bin/python$(VER)-static
 endif
 	ln -sf libpython$(VER).so.1.0 $(d)/usr/lib/libpython$(VER).so.1
 	ln -sf libpython$(VER).so.1 $(d)/usr/lib/libpython$(VER).so
@@ -468,8 +540,7 @@ endif
 	cp -p debian/pygettext.1 $(d)/usr/share/man/man1/pygettext$(VER).1
 
 	: # install the Makefile of the shared python build
-	sed -e 's,^CXX *=,CXX=		g++ -pthread,' \
-	    -e '/^OPT/s,-O3,-O2,' \
+	sed -e '/^OPT/s,-O3,-O2,' \
 	    -e 's,^RUNSHARED *=.*,RUNSHARED=,' \
 		build-shared/Makefile > $(d)/$(scriptdir)/config/Makefile
 
@@ -477,24 +548,28 @@ endif
 	dh_installdirs -p$(p_min) \
 		usr/bin \
 		usr/share/man/man1 \
-		$(scriptdir)
+		$(scriptdir) \
+		$(scriptdir)/site-packages
 	DH_COMPAT=2 dh_movefiles -p$(p_min) --sourcedir=$(d) \
 		usr/bin/python$(VER) \
 		usr/share/man/man1/python$(VER).1 \
 		$(foreach i,$(MIN_EXTS),$(scriptdir)/lib-dynload/$(i).so) \
 		$(foreach i,$(MIN_MODS),$(scriptdir)/$(i).py) \
 		$(foreach i,$(MIN_ENCODINGS),$(scriptdir)/$(i)) \
-		$(scriptdir)/site.py
+		$(scriptdir)/site.py \
+		$(scriptdir)/site-packages/pep-370-per-user-site-packages.pth
 
 ifneq ($(with_interp),static)
 	DH_COMPAT=2 dh_movefiles -p$(p_min) --sourcedir=$(d) \
 		usr/lib/libpython$(VER).so.*
 endif
 
+	# Install libpython into libpython$(VER) package
+	dh_movefiles --sourcedir=$(d) -p$(lib_p) usr/lib/lib$(PVER).so.1 usr/lib/lib$(PVER).so.1.0
+
 	: # Install sitecustomize.py.
 	dh_installdirs -p$(p_min) etc/$(PVER)
 	cp -p debian/sitecustomize.py $(d_min)/etc/$(PVER)/
-	patch -d $(d_min)/$(scriptdir) < debian/patches/site-builddir.diff
 	dh_link -p$(p_min) /etc/$(PVER)/sitecustomize.py \
 		/$(scriptdir)/sitecustomize.py
 
@@ -502,14 +577,21 @@ endif
 #	mv $(d)/usr/share/include/python$(VER)/* $(d)/usr/include/python$(VER)/.
 #	rm -rf $(d)/usr/share/include
 	dh_installdirs -p$(p_dev) \
-		usr/bin \
+		usr/share/doc/python$(VER) \
 		$(scriptdir) \
 		$(scriptdir)/doc/html \
-		usr/include
+		usr/include \
+		usr/lib
+	cp -p Misc/HISTORY Misc/README.valgrind Misc/gdbinit \
+		debian/README.maintainers \
+		debian/test_results $(buildd_static)/pybench.log \
+	    $(d_dev)/usr/share/doc/python$(VER)/
+
 	DH_COMPAT=2 dh_movefiles -p$(p_dev) --sourcedir=$(d) \
 		usr/lib/python$(VER)/config \
 		usr/include/python$(VER) \
-		usr/lib/libpython$(VER).so
+		usr/lib/libpython$(VER).so \
+		usr/bin/python$(VER)-config
 	mv $(d_dev)/usr/lib/python$(VER)/config/Makefile \
 		$(d)/usr/lib/python$(VER)/config/
 	mv $(d_dev)/usr/include/python$(VER)/pyconfig.h \
@@ -517,6 +599,7 @@ endif
 	cp -p $(buildd_shared)/libpython$(VER)-pic.a \
 		$(d_dev)/usr/lib/python$(VER)/config/
 
+ifeq (0,1)
 	: # copy the templates, scripts and tools from the Doc subdir
 	cp -a Doc/{commontex,perl,templates,texinputs,tools} \
 		$(d_dev)/usr/lib/python$(VER)/doc/.
@@ -524,15 +607,10 @@ endif
 		$(d_dev)/usr/lib/python$(VER)/doc/html/.
 	mkdir $(d_dev)/usr/lib/python$(VER)/doc/api
 	cp -a Doc/api/refcounts.dat $(d_dev)/usr/lib/python$(VER)/doc/api/.
-
-	: # backported python-config script
-	sed -e "s,@EXENAME@,$(PY_INTERPRETER)," \
-		debian/python-config.in > $(d_dev)/usr/bin/$(PVER)-config
-	chmod 755 $(d_dev)/usr/bin/$(PVER)-config
+endif
 
 ifeq ($(with_tk),yes)
 	: # Move the Tkinter files into $(p_tk).
-	chmod 644 $(d)/$(scriptdir)/lib-tk/Tix.py
 	dh_installdirs -p$(p_tk) \
 		$(scriptdir) \
 		usr/lib/python$(VER)/lib-dynload
@@ -560,8 +638,8 @@ endif
 	DH_COMPAT=2 dh_movefiles -p$(p_base) --sourcedir=$(d) \
 		$(scriptdir)/test/{regrtest.py,test_support.py,__init__.py,README,pystone.py}
 	rm -rf $(d)/$(scriptdir)/test
-	rm -rf $(d)/$(scriptdir)/email/test
 	rm -rf $(d)/$(scriptdir)/bsddb/test
+	rm -rf $(d)/$(scriptdir)/email/test
 
 	: # IDLE
 	mv $(d)/usr/bin/idle $(d)/usr/bin/idle-python$(VER)
@@ -616,13 +694,9 @@ endif
 	: # Move the docs into $(p_base)'s /usr/share/doc/$(PVER) directory,
 	: # all other packages only have a copyright file.
 	dh_installdocs -p$(p_base) \
-		README Misc/NEWS Misc/ACKS Misc/HISTORY \
-		Misc/README.valgrind \
-		Misc/gdbinit \
-		debian/README.maintainers \
-		debian/test_results
+		README Misc/NEWS Misc/ACKS
 	ln -sf NEWS.gz $(d_base)/usr/share/doc/$(p_base)/changelog.gz
-	dh_installdocs --all -N$(p_base) -N$(p_dbg) -N$(p_dev) debian/README.Debian
+	dh_installdocs --all -N$(p_base) -N$(p_dev) -N$(p_dbg) debian/README.Debian
 
 	: # IDLE has its own changelogs, docs...
 	dh_installchangelogs -p$(p_idle) Lib/idlelib/ChangeLog
@@ -662,7 +736,9 @@ endif
 		$(d_base)/usr/share/applications/$(PVER).desktop
 
 	: # remove some things
-	find debian -name '*.py[co]' | xargs rm -f
+	-find debian -name CVS | xargs rm -rf
+	-find debian -name .cvsignore | xargs rm -f
+	-find debian -name '*.py[co]' | xargs rm -f
 
 	: # remove empty directories, when all components are in place
 	for d in `find debian -depth -type d -empty 2> /dev/null`; do \
@@ -671,13 +747,7 @@ endif
 
 	: # install debug package
 	rm -rf $(d)-dbg
-#	$(MAKE) -C $(buildd_debug) install DESTDIR=$(CURDIR)/$(d)-dbg
-# XXX the install fails ... work around it.
-	-sed -i -e '/^oldsharedinstall/s/ *\$$(SHAREDMODS)$$//' \
-		-e '/^all/s/ sharedmods$$//' \
-		$(buildd_debug)/Makefile
-	$(MAKE) -C $(buildd_debug) DESTDIR=$(CURDIR)/$(d)-dbg \
-		altbininstall inclinstall libainstall oldsharedinstall
+	$(MAKE) -C $(buildd_debug) install DESTDIR=$(CURDIR)/$(d)-dbg
 	dh_installdirs -p$(p_dbg) \
 		usr/bin \
 		usr/share/man/man1 \
@@ -688,12 +758,13 @@ endif
 	cp -p debian/$(PVER)-dbg.README.Debian \
 		$(d_dbg)/usr/share/doc/$(p_base)/README.debug
 	cp -p $(buildd_debug)/python $(d_dbg)/usr/bin/$(PVER)-dbg
-	sed -e "s,@EXENAME@,$(PY_INTERPRETER)-dbg," \
-		debian/python-config.in > $(d_dbg)/usr/bin/$(PVER)-dbg-config
+	sed '1s,#!.*python[^ ]*\(.*\),#! $(PY_INTERPRETER)-dbg\1,' \
+		$(d)-dbg/usr/bin/$(PVER)-config \
+		> $(d_dbg)/usr/bin/$(PVER)-dbg-config
 	chmod 755 $(d_dbg)/usr/bin/$(PVER)-dbg-config
 	cp -p $(buildd_debug)/build/lib*/*_d.so \
 		$(d_dbg)/$(scriptdir)/lib-dynload/
-	
+
 ifeq ($(with_gdbm),yes)
 	# move debug files to corresponding debug package
 	dh_installdirs -p$(p_gdbm_dbg) $(scriptdir)/lib-dynload
@@ -702,7 +773,7 @@ ifeq ($(with_gdbm),yes)
 endif
 	rm -f $(d_dbg)/$(scriptdir)/lib-dynload/gdbm_d.so
 	rm -f $(d_dbg)/usr/lib/debug/$(scriptdir)/lib-dynload/gdbm.so
-	
+
 ifeq ($(with_tk),yes)
 	# move debug files to corresponding debug package
 	dh_installdirs -p$(p_tk_dbg) $(scriptdir)/lib-dynload
@@ -711,7 +782,7 @@ ifeq ($(with_tk),yes)
 endif
 	rm -f $(d_dbg)/$(scriptdir)/lib-dynload/_tkinter_d.so
 	rm -f $(d_dbg)/usr/lib/debug/$(scriptdir)/lib-dynload/_tkinter.so
-	
+
 	cp -a $(d)-dbg/$(scriptdir)/config_d $(d_dbg)/$(scriptdir)/
 	for i in $(d_dev)/usr/include/$(PVER)/*; do \
 	  i=$$(basename $$i); \
@@ -721,10 +792,10 @@ endif
 	cp -p $(buildd_debug)/pyconfig.h $(d_dbg)/usr/include/$(PVER)_d/
 	ln -sf $(PVER).1.gz $(d_dbg)/usr/share/man/man1/$(PVER)-dbg.1.gz
 
-	touch stamp-install
+	touch stamps/stamp-install
 
 # Build architecture-independent files here.
-binary-indep: $(install_target) $(build_target) stamp-build-doc stamp-control
+binary-indep: $(install_target) $(build_target) stamps/stamp-build-doc stamps/stamp-control
 	dh_testdir -i
 	dh_testroot -i
 
@@ -738,8 +809,8 @@ ifeq ($(with_doc),yes)
 	cat Doc/html*.tar \
 		| (cd $(d_doc)/usr/share/doc/$(p_base)/html; tar xf -)
 	-find $(d_doc)/usr/share/doc/$(p_base)/html ! -type d ! -perm 644
-	find $(d_doc)/usr/share/doc/$(p_base)/html ! -type d ! -perm 644 \
-		| xargs -r chmod 644
+	-find $(d_doc)/usr/share/doc/$(p_base)/html ! -type d ! -perm 644 \
+		| xargs chmod 644
 	mv $(d_doc)/usr/share/doc/$(p_base)/html/Python-Docs*/* \
 		$(d_doc)/usr/share/doc/$(p_base)/html/.
 	rmdir $(d_doc)/usr/share/doc/$(p_base)/html/Python-Docs*
@@ -793,12 +864,13 @@ binary-arch: build install
 	dh_installmenu -a
 	-dh_icons -a || dh_iconcache -a
 #	dh_installmime -a
-	dh_installinfo -a
 	dh_installchangelogs -a
 	for i in $(p_dev) $(p_dbg); do \
 	  rm -rf debian/$$i/usr/share/doc/$$i; \
 	  ln -s $(p_base) debian/$$i/usr/share/doc/$$i; \
 	done
+	-find debian ! -perm -200 -print -exec chmod +w {} \;
+
 ifneq ($(with_tk),yes)
 	rm -f $(d_base)/$(scriptdir)/lib-dynload/_tkinter.so
 else
@@ -831,123 +903,18 @@ endif
 	dh_md5sums -a
 	dh_builddeb -a
 
-# rules to patch the unpacked files in the source directory
-# ---------------------------------------------------------------------------
-# various rules to unpack addons and (un)apply patches.
-# 	- patch / apply-patches
-#	- unpatch / reverse-patches
+patch: stamps/stamp-configure
 
-patchdir	= debian/patches
+stamps:
+	mkdir -p stamps
 
-debian_doc_patches = \
-	reapplied-svn-doc-updates \
-	doc-faq \
-	profile-doc \
-	signal.set_wakeup_fd-doc \
+# Simply rebuild configure once to contain any changes made to configure.in by patches.
+stamps/stamp-configure: stamps configure.in
+	rm -rf autom4te.cache configure
+	autoconf
+	autoheader
+	touch stamps/stamp-configure
 
-# which patches should be applied?
-debian_patches = \
-	reapplied-svn-updates \
-	$(debian_doc_patches) \
-	deb-setup \
-	deb-locations \
-	optparse-no-gettext \
-	locale-module \
-	distutils-link \
-	test-sundry \
-	distutils-debian \
-	difflib \
-	tkinter-import \
-	ftp_nlst \
-	distutils-exec-prefix \
-	remove-dup-decl \
-	webbrowser \
-	mmap-64bit \
-	egg-info-no-version \
-	debug-build \
-	strxfrm-leak \
-	db4.6 \
-	emacs23-build \
-	gcc-fwrapv \
-	issue961805 \
-	signal.set_wakeup_fd \
-	no-zip-on-sys.path \
-	fix-mailman-digests \
-	distutils-install-layout \
-	platform-lsbrelease \
-	CVE-2009-3720 \
-	CVE-2009-3560 \
-	deadsnakes-natty-search-new-library-dirs \
-	deadsnakes-add-profile-pstats \
-	deadsnakes-fix-debug-ext \
-
-ifeq ($(with_fpectl),yes)
-  debian_patches += \
-	enable-fpectl
-endif
-
-#	svn-updates \
-#	html-docs \
-#	patchlevel \
-
-glibc_version := $(shell dpkg -s locales | awk '/^Version:/ {print $$2}')
-broken_utimes := $(shell dpkg --compare-versions $(glibc_version) lt 2.3.5 && echo yes || echo no)
-ifeq ($(broken_utimes),yes)
-  debian_patches += \
-	disable-utimes
-endif
-
-ifeq ($(distribution),Ubuntu)
-  debian_patches += \
-	langpack-gettext
-endif
-
-ifeq ($(DEB_BUILD_ARCH_OS),hurd)
-  debian_patches += \
-	no-large-file-support \
-	cthreads
-endif
-
-ifneq (,$(findstring -doc, $(PKGSOURCE)))
-  debian_patches := $(debian_doc_patches)
-endif
-
-patch: patch-stamp
-apply-patches: patch-stamp
-
-patch-stamp: $(foreach p,$(debian_patches),patch-stamp-$(p))
-	echo ""; echo "Patches applied in this version:" > pxxx
-	for i in $(debian_patches); do \
-	  echo "" >> pxxx; echo "$$i:" >> pxxx; \
-	  sed -n 's/^# *DP: */  /p' $(patchdir)/$$i.dpatch >> pxxx; \
-	done
-	mv -f pxxx $@
-
-reverse-patches: unpatch
-unpatch:
-	for stamp in none `ls -1t patch-stamp-* 2>/dev/null`; do \
-	  case "$$stamp" in none|patched-stamp|patched-\*) continue; esac; \
-	  patch=`echo $$stamp | sed -e 's,patch-stamp-,,'`; \
-	  echo "trying to revert patch $$patch ..."; \
-	  if [ -x $(patchdir)/$$patch.dpatch ]; then true; else \
-	    chmod +x $(patchdir)/$$patch.dpatch; fi; \
-	  if $(patchdir)/$$patch.dpatch -unpatch; then \
-	    echo "reverted $$patch patch."; \
-	    rm -f $$stamp; \
-	  else \
-	    echo "error in reverting $$patch patch."; \
-	    exit 1; \
-	  fi; \
-	done
-	rm -f patch-stamp
-
-patch-stamp-%: $(patchdir)/%.dpatch
-	if [ -x $< ]; then true; else chmod +x $<; fi
-	if [ -f $@ ]; then \
-	  echo "$* patches already applied."; exit 1; \
-	fi
-	$< -patch
-	echo "$* patches applied." > $@
 
 binary: binary-indep binary-arch
 

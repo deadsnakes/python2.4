@@ -5,19 +5,19 @@ Maintainer: Felix Krull <f_krull@gmx.de>
 XSBC-Original-Maintainer: Matthias Klose <doko@debian.org>
 Build-Depends: debhelper (>= 5), autoconf, libreadline-dev, libncursesw5-dev (>= 5.3), tk8.5-dev, libdb4.8-dev, zlib1g-dev, libgdbm-dev, blt-dev (>= 2.4z), libssl-dev, libbz2-dev, libbluetooth-dev [!hurd-i386 !kfreebsd-i386 !kfreebsd-amd64], locales, mime-support, libgpm2 [!hurd-i386 !kfreebsd-i386 !kfreebsd-amd64], netbase, lsb-release, bzip2
 Build-Depends-Indep: libhtml-tree-perl, texlive-latex-recommended, texinfo, emacs23, debiandoc-sgml, sharutils, latex2html, python
-Build-Conflicts: tcl8.3-dev, tk8.3-dev, python2.4-xml, python-xml
+Build-Conflicts: tcl8.4-dev, tk8.4-dev, tcl8.3-dev, tk8.3-dev, python2.4-xml, python-xml
 XS-Python-Version: 2.4
-Standards-Version: 3.9.1
+Standards-Version: 3.9.3
 Homepage: http://python.org/
+Vcs-Browser: https://code.launchpad.net/~doko/python/pkg2.4
+Vcs-Bzr: http://bazaar.launchpad.net/~doko/python/pkg2.4
 
 Package: python2.4
 Architecture: any
 Priority: optional
 Depends: python2.4-minimal (= ${binary:Version}), mime-support, ${shlibs:Depends}, ${misc:Depends}
 Suggests: python2.4-doc
-Provides: python2.4-cjkcodecs, python2.4-plist, python2.4-profiler
-Replaces: python2.4-minimal (<< 2.4-3), python2.4-dev (<= 2.4.4-4), idle-python2.4 (<< 2.4.3-8), python-tk (<< 2.4.3-2)
-Conflicts: python2.4-dev (<< 2.3.95-2), python-central (<< 0.5), idle-python2.4 (<< 2.4.3-8), python-tk (<< 2.4.3-2)
+Provides: python2.4-cjkcodecs, python2.4-plistlib, python2.4-profiler
 XB-Python-Version: 2.4
 Description: An interactive high-level object-oriented language (version 2.4)
  Version 2.4 of the high-level, interactive object oriented language,
@@ -26,12 +26,11 @@ Description: An interactive high-level object-oriented language (version 2.4)
 
 Package: python2.4-minimal
 Architecture: any
-Priority: optional
+Priority: required
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: binfmt-support
 Conflicts: binfmt-support (<< 1.1.2)
-Replaces: python2.4 (<< 2.4.4-8)
-Recommends:  python2.4
+Recommends: python2.4
 XB-Python-Runtime: python2.4
 XB-Python-Version: 2.4
 Description: A minimal subset of the Python language (version 2.4)
@@ -39,6 +38,19 @@ Description: A minimal subset of the Python language (version 2.4)
  be used in the boot process for some basic tasks.
  See /usr/share/doc/python2.4-minimal/README.Debian for a list of the modules
  contained in this package.
+
+Package: libpython2.4
+Architecture: any
+Section: libs
+Priority: optional
+Depends: python2.4 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Shared Python runtime library (v2.4)
+ Version 2.4 of the high-level, interactive object oriented language,
+ includes an extensive class library with lots of goodies for
+ network programming, system administration, sounds and graphics.
+ .
+ This package contains the shared runtime library, normally not needed
+ for programs using the statically linked interpreter.
 
 Package: python2.4-examples
 Architecture: all
@@ -49,8 +61,9 @@ Description: Examples for the Python language (v2.4)
 
 Package: python2.4-dev
 Architecture: any
-Depends: python2.4 (= ${binary:Version}), ${misc:Depends}
-Recommends: libc6-dev | libc-dev
+Depends: python2.4 (= ${binary:Version}), libpython2.4 (= ${binary:Version}), ${misc:Depends}
+Recommends: libc6-dev | libc-dev, gcc
+Suggests: python-old-doctools
 Description: Header files and a static library for Python (v2.4)
  Header files, a static library and development tools for building
  Python (v2.4) modules, extending the Python interpreter or embedding
@@ -60,17 +73,27 @@ Description: Header files and a static library for Python (v2.4)
 
 Package: idle-python2.4
 Architecture: all
-Depends: python2.4, python2.4-tk-deadsnakes, ${misc:Depends}
+Depends: python2.4, python2.4-tk, ${misc:Depends}
 Enhances: python2.4
 XB-Python-Version: 2.4
 Description: An IDE for Python (v2.4) using Tkinter
  IDLE is an Integrated Development Environment for Python (v2.4).
  IDLE is written using Tkinter and therefore quite platform-independent.
 
+Package: python2.4-dbg
+Section: debug
+Architecture: any
+Priority: extra
+Depends: python2.4 (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Suggests: python2.4-gdbm-dbg, python2.4-tk-dbg
+Description: Debug Build of the Python Interpreter (version 2.4)
+ Python interpreter configured with --pydebug. Dynamically loaded modules are
+ searched in /usr/lib/python2.4/lib-dynload/debug first.
+
 Package: python2.4-doc
 Section: doc
 Architecture: all
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, dpkg (>= 1.15.4) | install-info
 Suggests: python2.4
 Description: Documentation for the high-level object-oriented language Python (v2.4)
  These is the official set of documentation for the interactive high-level
@@ -88,45 +111,36 @@ Description: Documentation for the high-level object-oriented language Python (v
    * Documenting Python
    * Distributing Python Modules
 
-Package: python2.4-dbg
-Architecture: any
-Priority: extra
-Depends: python2.4 (>= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
-Suggests: python2.4-gdbm-deadsnakes-dbg, python2.4-tk-deadsnakes-dbg
-Description: Debug Build of the Python Interpreter (version 2.4)
- Python interpreter configured with --pydebug. Dynamically loaded modules are
- searched in /usr/lib/python2.4/lib-dynload/debug first.
 
-
-Package: python2.4-tk-deadsnakes
+Package: python2.4-tk
 Architecture: any
 Depends: python2.4, ${python:Depends}, ${shlibs:Depends}, ${misc:Depends}
-Provides: ${python:Provides}
-Suggests: tix, python2.4-tk-deadsnakes-dbg
 Conflicts: python-tk-deadsnakes
 Replaces: python-tk-deadsnakes
+Provides: ${python:Provides}
+Suggests: tix, python2.4-tk-dbg
 XB-Python-Version: ${python:Versions}
 Description: Tkinter - Writing Tk applications with Python (v2.4)
  A module for writing portable GUI applications with Python (v2.4) using Tk.
  Also known as Tkinter.
 
-Package: python2.4-gdbm-deadsnakes
+Package: python2.4-gdbm
 Architecture: any
 Depends: python2.4, ${python:Depends}, ${shlibs:Depends}, ${misc:Depends}
-Provides: ${python:Provides}
-Suggests: python2.4-gdbm-deadsnakes-dbg
 Conflicts: python-gdbm-deadsnakes
 Replaces: python-gdbm-deadsnakes
+Provides: ${python:Provides}
+Suggests: python2.4-gdbm-dbg
 XB-Python-Version: ${python:Versions}
 Description: GNU dbm database support for Python (v2.4)
  GNU dbm database module for Python (v2.4). Install this if you want to
  create or read GNU dbm database files with Python.
 
-Package: python2.4-tk-deadsnakes-dbg
+Package: python2.4-tk-dbg
 Architecture: any
 Priority: extra
 Section: debug
-Depends: python2.4, ${python:Depends}, python2.4-tk-deadsnakes (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: python2.4, ${python:Depends}, python2.4-tk (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: python-tk-deadsnakes-dbg
 Replaces: python-tk-deadsnakes-dbg
 Description: Tkinter - Writing Tk applications with Python (v2.4 debug extension)
@@ -135,11 +149,11 @@ Description: Tkinter - Writing Tk applications with Python (v2.4 debug extension
  .
  This package contains the extensions built for the python debug interpreter.
 
-Package: python2.4-gdbm-deadsnakes-dbg
+Package: python2.4-gdbm-dbg
 Architecture: any
 Priority: extra
 Section: debug
-Depends: python2.4, ${python:Depends}, python2.4-gdbm-deadsnakes (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: python2.4, ${python:Depends}, python2.4-gdbm (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: python-gdbm-deadsnakes-dbg
 Replaces: python-gdbm-deadsnakes-dbg
 Description: GNU dbm database support for Python (v2.4 debug extension)
@@ -147,4 +161,31 @@ Description: GNU dbm database support for Python (v2.4 debug extension)
  create or read GNU dbm database files with Python.
  .
  This package contains the extensions built for the python debug interpreter.
+
+
+Package: python2.4-complete
+Architecture: all
+Priority: optional
+Depends:
+ python2.4 (>= ${binary:Version}),
+ python2.4-minimal (>= ${binary:Version}),
+ libpython2.4 (>= ${binary:Version}),
+ python2.4-examples (>= ${binary:Version}),
+ python2.4-dev (>= ${binary:Version}),
+ idle-python2.4 (>= ${binary:Version}),
+ python2.4-doc (>= ${binary:Version}),
+ python2.4-dbg (>= ${binary:Version}),
+ python2.4-tk (>= ${binary:Version}),
+ python2.4-gdbm (>= ${binary:Version}),
+ python2.4-tk-dbg (>= ${binary:Version}),
+ python2.4-gdbm-dbg (>= ${binary:Version}),
+ ${shlibs:Depends}, ${misc:Depends}
+XB-Python-Version: 2.4
+Description: An interactive high-level object-oriented language (version 2.4)
+ Version 2.4 of the high-level, interactive object oriented language,
+ includes an extensive class library with lots of goodies for
+ network programming, system administration, sounds and graphics.
+ .
+ This package depends on all individual packages that were generated from the
+ python2.4 source package.
 
