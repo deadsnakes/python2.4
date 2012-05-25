@@ -176,8 +176,7 @@ stamps/stamp-build-debug: stamps/stamp-configure-debug
 common_configure_args = \
 		--prefix=/usr \
 		--enable-ipv6 \
-		--enable-unicode=ucs4 \
-		--without-cxx
+		--enable-unicode=ucs4
 
 ifeq ($(with_fpectl),yes)
   common_configure_args += \
@@ -574,6 +573,7 @@ endif
 #	mv $(d)/usr/share/include/python$(VER)/* $(d)/usr/include/python$(VER)/.
 #	rm -rf $(d)/usr/share/include
 	dh_installdirs -p$(p_dev) \
+		usr/bin \
 		usr/share/doc/python$(VER) \
 		$(scriptdir) \
 		$(scriptdir)/doc/html \
