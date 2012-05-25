@@ -1,0 +1,30 @@
+# DP: determine the platform from /etc/lsb-release
+
+--- a/Lib/platform.py
++++ b/Lib/platform.py
+@@ -236,6 +236,25 @@
+     except os.error:
+         # Probably not a Unix system
+         return distname,version,id
++
++    if os.path.exists('/etc/lsb-release'):
++        for line in open('/etc/lsb-release'):
++            line = line.strip()
++            if not line:
++                continue
++            var, arg = line.split('=', 1)
++            if var.startswith('DISTRIB_'):
++                var = var[8:]
++                if arg.startswith('"') and arg.endswith('"'):
++                    arg = arg[1:-1]
++                if var == 'ID':
++                    distname = arg
++                elif var == 'RELEASE':
++                    version = arg
++                elif var == 'CODENAME':
++                    id = arg
++        return distname,version,id
++
+     for file in etc:
+         m = _release_filename.match(file)
+         if m:

@@ -238,6 +238,8 @@ class Message:
             return
         if isinstance(charset, str):
             charset = Charset.Charset(charset)
+        if isinstance(charset, unicode):
+            charset = Charset.Charset(str(charset))
         if not isinstance(charset, Charset.Charset):
             raise TypeError(charset)
         # BAW: should we accept strings that can serve as arguments to the

@@ -1,0 +1,11 @@
+--- a/configure.in
++++ b/configure.in
+@@ -729,6 +729,8 @@
+ if test "$Py_DEBUG" = 'true'
+ then
+ 	DEBUG_EXT=_d
++else
++	DEBUG_EXT=
+ fi
+ AC_SUBST(DEBUG_EXT)
+ 

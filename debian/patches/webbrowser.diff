@@ -1,0 +1,40 @@
+# Recognize other browsers: www-browser, x-www-browser, firefox, iceweasel, iceape.
+
+--- a/Lib/webbrowser.py
++++ b/Lib/webbrowser.py
+@@ -261,10 +261,13 @@
+ # the TERM and DISPLAY cases, because we might be running Python from inside
+ # an xterm.
+ if os.environ.get("TERM") or os.environ.get("DISPLAY"):
+-    _tryorder = ["links", "lynx", "w3m"]
++    _tryorder = ["www-browser", "links", "lynx", "w3m"]
+ 
+     # Easy cases first -- register console browsers if we have them.
+     if os.environ.get("TERM"):
++        # a generic browser command handled by alternatives
++        if _iscommand("www-browser"):
++            register("www-browser", None, GenericBrowser("www-browser '%s'"))
+         # The Links browser <http://artax.karlin.mff.cuni.cz/~mikulas/links/>
+         if _iscommand("links"):
+             register("links", None, GenericBrowser("links '%s'"))
+@@ -277,12 +280,18 @@
+ 
+     # X browsers have more in the way of options
+     if os.environ.get("DISPLAY"):
+-        _tryorder = ["galeon", "skipstone",
++        _tryorder = ["x-www-browser", "galeon", "skipstone",
++                     "firefox", "iceweasel", "iceape",
+                      "mozilla-firefox", "mozilla-firebird", "mozilla", "netscape",
+                      "kfm", "grail"] + _tryorder
+ 
++        # a generic browser command handled by alternatives
++        if _iscommand("x-www-browser"):
++            register("x-www-browser", None, GenericBrowser("x-www-browser '%s'"))
++
+         # First, the Netscape series
+-        for browser in ("mozilla-firefox", "mozilla-firebird",
++        for browser in ("firefox", "iceweasel", "iceape",
++                        "mozilla-firefox", "mozilla-firebird",
+                         "mozilla", "netscape"):
+             if _iscommand(browser):
+                 register(browser, None, Netscape(browser))

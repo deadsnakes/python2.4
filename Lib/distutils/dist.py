@@ -1015,7 +1015,10 @@ class DistributionMetadata:
                          "license", "description", "long_description",
                          "keywords", "platforms", "fullname", "contact",
                          "contact_email", "license", "classifiers",
-                         "download_url")
+                         "download_url",
+                         # PEP 314
+                         "provides", "requires", "obsoletes",
+                         )
 
     def __init__ (self):
         self.name = None
@@ -1032,6 +1035,10 @@ class DistributionMetadata:
         self.platforms = None
         self.classifiers = None
         self.download_url = None
+        # PEP 314
+        self.provides = None
+        self.requires = None
+        self.obsoletes = None
 
     def write_pkg_info (self, base_dir):
         """Write the PKG-INFO file into the release tree.
@@ -1066,6 +1073,43 @@ class DistributionMetadata:
         pkg_info.close()
 
     # write_pkg_info ()
+
+    def write_pkg_file (self, file):
+        """Write the PKG-INFO format data to a file object.
+        """
+        version = '1.0'
+        if self.provides or self.requires or self.obsoletes:
+            version = '1.1'
+
+        file.write('Metadata-Version: %s\n' % version)
+        file.write('Name: %s\n' % self.get_name() )
+        file.write('Version: %s\n' % self.get_version() )
+        file.write('Summary: %s\n' % self.get_description() )
+        file.write('Home-page: %s\n' % self.get_url() )
+        file.write('Author: %s\n' % self.get_contact() )
+        file.write('Author-email: %s\n' % self.get_contact_email() )
+        file.write('License: %s\n' % self.get_license() )
+        if self.download_url:
+            file.write('Download-URL: %s\n' % self.download_url)
+
+        long_desc = rfc822_escape( self.get_long_description() )
+        file.write('Description: %s\n' % long_desc)
+
+        keywords = string.join( self.get_keywords(), ',')
+        if keywords:
+            file.write('Keywords: %s\n' % keywords )
+
+        self._write_list(file, 'Platform', self.get_platforms())
+        self._write_list(file, 'Classifier', self.get_classifiers())
+
+        # PEP 314
+        self._write_list(file, 'Requires', self.get_requires())
+        self._write_list(file, 'Provides', self.get_provides())
+        self._write_list(file, 'Obsoletes', self.get_obsoletes())
+
+    def _write_list (self, file, name, values):
+        for value in values:
+            file.write('%s: %s\n' % (name, value))
 
     # -- Metadata query methods ----------------------------------------
 
@@ -1124,6 +1168,36 @@ class DistributionMetadata:
 
     def get_download_url(self):
         return self.download_url or "UNKNOWN"
+
+    # PEP 314
+
+    def get_requires(self):
+        return self.requires or []
+
+    def set_requires(self, value):
+        import distutils.versionpredicate
+        for v in value:
+            distutils.versionpredicate.VersionPredicate(v)
+        self.requires = value
+
+    def get_provides(self):
+        return self.provides or []
+
+    def set_provides(self, value):
+        value = [v.strip() for v in value]
+        for v in value:
+            import distutils.versionpredicate
+            distutils.versionpredicate.split_provision(v)
+        self.provides = value
+
+    def get_obsoletes(self):
+        return self.obsoletes or []
+
+    def set_obsoletes(self, value):
+        import distutils.versionpredicate
+        for v in value:
+            distutils.versionpredicate.VersionPredicate(v)
+        self.obsoletes = value
 
 # class DistributionMetadata
 

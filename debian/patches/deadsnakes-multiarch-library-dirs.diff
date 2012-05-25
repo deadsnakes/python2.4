@@ -1,0 +1,15 @@
+Description: Search new '/usr/lib/$(DEB_BUILD_GNU_TYPE)' directories for
+ libraries
+Author: Felix Krull <f_krull@gmx.de>
+Forwarded: no
+--- a/setup.py
++++ b/setup.py
+@@ -270,6 +270,8 @@
+         lib_dirs = self.compiler.library_dirs + [
+             '/lib64', '/usr/lib64',
+             '/lib', '/usr/lib',
++            '/lib/%s' % os.getenv('DEB_BUILD_MULTIARCH'),
++            '/usr/lib/%s' % os.getenv('DEB_BUILD_MULTIARCH')
+             ]
+         inc_dirs = self.compiler.include_dirs + ['/usr/include']
+         gnu_triplet = os.popen('dpkg-architecture -qDEB_HOST_GNU_TYPE').readline()[:-1]; print 'XXX', gnu_triplet

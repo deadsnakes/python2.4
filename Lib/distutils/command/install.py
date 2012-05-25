@@ -44,6 +44,13 @@ INSTALL_SCHEMES = {
         'scripts': '$base/bin',
         'data'   : '$base',
         },
+    'debian_prefix': {
+        'purelib': '$base/lib/python$py_version_short/dist-packages',
+        'platlib': '$platbase/lib/python$py_version_short/dist-packages',
+        'headers': '$base/include/python$py_version_short/$dist_name',
+        'scripts': '$base/bin',
+        'data'   : '$base',
+        },
     'unix_home': {
         'purelib': '$base/lib/python',
         'platlib': '$base/lib/python',
@@ -86,6 +93,8 @@ class install (Command):
          "(Unix only) prefix for platform-specific files"),
         ('home=', None,
          "(Unix only) home directory to install under"),
+        ('debian', None,
+         "install into distribution specific locations for deb based distributions"),
 
         # Or, just set the base director(y|ies)
         ('install-base=', None,
@@ -135,6 +144,9 @@ class install (Command):
 
         ('record=', None,
          "filename in which to record list of installed files"),
+
+        ('install-layout=', None,
+         "installation layout to choose (known values: deb)"),
         ]
 
     boolean_options = ['compile', 'force', 'skip-build']
@@ -148,6 +160,7 @@ class install (Command):
         self.prefix = None
         self.exec_prefix = None
         self.home = None
+        self.debian = None
 
         # These select only the installation base; it's up to the user to
         # specify the installation scheme (currently, that means supplying
@@ -166,6 +179,9 @@ class install (Command):
         self.install_lib = None         # set to either purelib or platlib
         self.install_scripts = None
         self.install_data = None
+
+        # enable custom installation, known values: deb, IGNORED in 2.5
+        self.install_layout = None
 
         self.compile = None
         self.optimize = None
@@ -231,15 +247,15 @@ class install (Command):
         # Check for errors/inconsistencies in the options; first, stuff
         # that's wrong on any platform.
 
-        if ((self.prefix or self.exec_prefix or self.home) and
+        if ((self.prefix or self.exec_prefix or self.home or self.debian) and
             (self.install_base or self.install_platbase)):
             raise DistutilsOptionError, \
-                  ("must supply either prefix/exec-prefix/home or " +
+                  ("must supply either prefix/exec-prefix/home/debian or " +
                    "install-base/install-platbase -- not both")
 
-        if self.home and (self.prefix or self.exec_prefix):
+        if (self.home or self.debian) and (self.prefix or self.exec_prefix):
             raise DistutilsOptionError, \
-                  "must supply either home or prefix/exec-prefix -- not both"
+                  "must supply either home/debian or prefix/exec-prefix -- not both"
 
         # Next, stuff that's wrong (or dubious) only on certain platforms.
         if os.name != "posix":
@@ -394,7 +410,10 @@ class install (Command):
 
             self.install_base = self.prefix
             self.install_platbase = self.exec_prefix
-            self.select_scheme("unix_prefix")
+            if self.debian is not None:
+                self.select_scheme("debian_prefix")
+            else:
+                self.select_scheme("unix_prefix")
 
     # finalize_unix ()
 
@@ -601,6 +620,7 @@ class install (Command):
                     ('install_headers', has_headers),
                     ('install_scripts', has_scripts),
                     ('install_data',    has_data),
+                    ('install_egg_info', lambda self:True),
                    ]
 
 # class install

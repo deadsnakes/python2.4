@@ -1,0 +1,120 @@
+# DP: Patch #1365916: fix some unsafe 64-bit mmap methods, backport from 2.5
+
+--- a/Lib/test/test_mmap.py
++++ b/Lib/test/test_mmap.py
+@@ -328,6 +328,22 @@
+         os.unlink(TESTFN)
+ 
+ 
++    # make move works everywhere (64-bit format problem earlier)
++    f = open(TESTFN, 'w+')
++
++    try:    # unlink TESTFN no matter what
++        f.write("ABCDEabcde") # Arbitrary character
++        f.flush()
++
++        mf = mmap.mmap(f.fileno(), 10)
++        mf.move(5, 0, 5)
++        verify(mf[:] == "ABCDEABCDE", "Map move should have duplicated front 5")
++        mf.close()
++        f.close()
++
++    finally:
++        os.unlink(TESTFN)
++
+     print ' Test passed'
+ 
+ test_both()
+--- a/Modules/mmapmodule.c
++++ b/Modules/mmapmodule.c
+@@ -374,7 +374,7 @@
+ {
+ 	unsigned long new_size;
+ 	CHECK_VALID(NULL);
+-	if (!PyArg_ParseTuple (args, "l:resize", &new_size) || 
++	if (!PyArg_ParseTuple (args, "k:resize", &new_size) || 
+ 	    !is_resizeable(self)) {
+ 		return NULL;
+ #ifdef MS_WINDOWS
+@@ -463,10 +463,10 @@
+ static PyObject *
+ mmap_flush_method(mmap_object *self, PyObject *args)
+ {
+-	size_t offset	= 0;
+-	size_t size = self->size;
++	unsigned long offset = 0;
++	unsigned long size = self->size;
+ 	CHECK_VALID(NULL);
+-	if (!PyArg_ParseTuple (args, "|ll:flush", &offset, &size)) {
++	if (!PyArg_ParseTuple (args, "|kk:flush", &offset, &size)) {
+ 		return NULL;
+ 	} else if ((offset + size) > self->size) {
+ 		PyErr_SetString (PyExc_ValueError,
+@@ -539,7 +539,7 @@
+ {
+ 	unsigned long dest, src, count;
+ 	CHECK_VALID(NULL);
+-	if (!PyArg_ParseTuple (args, "iii:move", &dest, &src, &count) ||
++	if (!PyArg_ParseTuple (args, "kkk:move", &dest, &src, &count) ||
+ 	    !is_writeable(self)) {
+ 		return NULL;
+ 	} else {
+@@ -863,7 +863,7 @@
+ 	PyObject *map_size_obj = NULL;
+ 	int map_size;
+ 	int fd, flags = MAP_SHARED, prot = PROT_WRITE | PROT_READ;
+-	access_mode access = ACCESS_DEFAULT;
++	int access = (int)ACCESS_DEFAULT;
+ 	char *keywords[] = {"fileno", "length", 
+ 			    "flags", "prot", 
+ 			    "access", NULL};
+@@ -875,11 +875,11 @@
+ 	if (map_size < 0)
+ 		return NULL;
+ 
+-	if ((access != ACCESS_DEFAULT) && 
++	if ((access != (int)ACCESS_DEFAULT) && 
+ 	    ((flags != MAP_SHARED) || ( prot != (PROT_WRITE | PROT_READ))))
+ 		return PyErr_Format(PyExc_ValueError, 
+ 				    "mmap can't specify both access and flags, prot.");
+-	switch(access) {
++	switch((access_mode)access) {
+ 	case ACCESS_READ:
+ 		flags = MAP_SHARED;
+ 		prot = PROT_READ;
+@@ -937,7 +937,7 @@
+ 		PyErr_SetFromErrno(mmap_module_error);
+ 		return NULL;
+ 	}
+-	m_obj->access = access;
++	m_obj->access = (access_mode)access;
+ 	return (PyObject *)m_obj;
+ }
+ #endif /* UNIX */
+@@ -953,7 +953,7 @@
+ 	DWORD dwErr = 0;
+ 	int fileno;
+ 	HANDLE fh = 0;
+-	access_mode   access = ACCESS_DEFAULT;
++	int access = (access_mode)ACCESS_DEFAULT;
+ 	DWORD flProtect, dwDesiredAccess;
+ 	char *keywords[] = { "fileno", "length", 
+ 			     "tagname", 
+@@ -965,7 +965,7 @@
+ 		return NULL;
+ 	}
+ 
+-	switch(access) {
++	switch((access_mode)access) {
+ 	case ACCESS_READ:
+ 		flProtect = PAGE_READONLY;
+ 		dwDesiredAccess = FILE_MAP_READ;
+@@ -1050,7 +1050,7 @@
+ 	else
+ 		m_obj->tagname = NULL;
+ 
+-	m_obj->access = access;
++	m_obj->access = (access_mode)access;
+ 	m_obj->map_handle = CreateFileMapping (m_obj->file_handle,
+ 					       NULL,
+ 					       flProtect,

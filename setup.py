@@ -240,8 +240,9 @@ class PyBuildExt(build_ext):
 
     def detect_modules(self):
         # Ensure that /usr/local is always used
-        add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
-        add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
+        # On Debian /usr/local is always used, so we don't include it twice
+        #add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
+        #add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
 
         # Add paths to popular package managers on OS X/darwin
         if sys.platform == "darwin":
@@ -269,8 +270,12 @@ class PyBuildExt(build_ext):
         lib_dirs = self.compiler.library_dirs + [
             '/lib64', '/usr/lib64',
             '/lib', '/usr/lib',
+            '/lib/%s' % os.getenv('DEB_BUILD_MULTIARCH'),
+            '/usr/lib/%s' % os.getenv('DEB_BUILD_MULTIARCH')
             ]
         inc_dirs = self.compiler.include_dirs + ['/usr/include']
+        gnu_triplet = os.popen('dpkg-architecture -qDEB_HOST_GNU_TYPE').readline()[:-1]; print 'XXX', gnu_triplet
+        inc_dirs.append(os.path.join('/usr/include', gnu_triplet))
         exts = []
 
         platform = self.get_platform()
@@ -522,9 +527,38 @@ class PyBuildExt(build_ext):
         #
         # http://www.sleepycat.com/update/index.html
 
-        max_db_ver = (4, 4)
-        min_db_ver = (3, 2)
+        max_db_ver = (5, 3)
+        min_db_ver = (4, 8)
         db_setup_debug = False   # verbose debug prints from this script?
+
+        def allow_db_ver(db_ver):
+            """Returns a boolean if the given BerkeleyDB version is acceptable.
+
+            Args:
+              db_ver: A tuple of the version to verify.
+            """
+            if not (min_db_ver <= db_ver <= max_db_ver):
+                return False
+            # Use this function to filter out known bad configurations.
+            if (4, 6) == db_ver[:2]:
+                # BerkeleyDB 4.6.x is not stable on many architectures.
+                arch = platform_machine()
+                if arch not in ('i386', 'i486', 'i586', 'i686',
+                                'x86_64', 'ia64'):
+                    return False
+            return True
+
+        def gen_db_minor_ver_nums(major):
+            if major == 4:
+                for x in range(max_db_ver[1]+1):
+                    if allow_db_ver((4, x)):
+                        yield x
+            elif major == 3:
+                for x in (3,):
+                    if allow_db_ver((3, x)):
+                        yield x
+            else:
+                raise ValueError("unknown major BerkeleyDB version", major)
 
         # construct a list of paths to look for the header file in on
         # top of the normal inc_dirs.
@@ -532,22 +566,25 @@ class PyBuildExt(build_ext):
             '/usr/include/db4',
             '/usr/local/include/db4',
             '/opt/sfw/include/db4',
-            '/sw/include/db4',
             '/usr/include/db3',
             '/usr/local/include/db3',
             '/opt/sfw/include/db3',
+            # Fink defaults (http://fink.sourceforge.net/)
+            '/sw/include/db4',
             '/sw/include/db3',
         ]
         # 4.x minor number specific paths
-        for x in (0,1,2,3,4):
+        for x in gen_db_minor_ver_nums(4):
             db_inc_paths.append('/usr/include/db4%d' % x)
             db_inc_paths.append('/usr/include/db4.%d' % x)
             db_inc_paths.append('/usr/local/BerkeleyDB.4.%d/include' % x)
             db_inc_paths.append('/usr/local/include/db4%d' % x)
             db_inc_paths.append('/pkg/db-4.%d/include' % x)
             db_inc_paths.append('/opt/db-4.%d/include' % x)
+            # MacPorts default (http://www.macports.org/)
+            db_inc_paths.append('/opt/local/include/db4%d' % x)
         # 3.x minor number specific paths
-        for x in (2,3):
+        for x in gen_db_minor_ver_nums(3):
             db_inc_paths.append('/usr/include/db3%d' % x)
             db_inc_paths.append('/usr/local/BerkeleyDB.3.%d/include' % x)
             db_inc_paths.append('/usr/local/include/db3%d' % x)
@@ -562,16 +599,20 @@ class PyBuildExt(build_ext):
         for dn in inc_dirs:
             std_variants.append(os.path.join(dn, 'db3'))
             std_variants.append(os.path.join(dn, 'db4'))
-            for x in (0,1,2,3,4):
+            for x in gen_db_minor_ver_nums(4):
                 std_variants.append(os.path.join(dn, "db4%d"%x))
                 std_variants.append(os.path.join(dn, "db4.%d"%x))
-            for x in (2,3):
+            for x in gen_db_minor_ver_nums(3):
                 std_variants.append(os.path.join(dn, "db3%d"%x))
                 std_variants.append(os.path.join(dn, "db3.%d"%x))
 
         db_inc_paths = std_variants + db_inc_paths
+        db_inc_paths = [p for p in db_inc_paths if os.path.exists(p)]
 
         db_ver_inc_map = {}
+
+        if sys.platform == 'darwin':
+            sysroot = macosx_sdk_root()
 
         class db_found(Exception): pass
         try:
@@ -579,6 +620,10 @@ class PyBuildExt(build_ext):
             # search path.
             for d in inc_dirs + db_inc_paths:
                 f = os.path.join(d, "db.h")
+
+                if sys.platform == 'darwin' and is_macosx_sdk_path(d):
+                    f = os.path.join(sysroot, d[1:], "db.h")
+
                 if db_setup_debug: print "db: looking for db.h in", f
                 if os.path.exists(f):
                     f = open(f).read()
@@ -589,18 +634,29 @@ class PyBuildExt(build_ext):
                         db_minor = int(m.group(1))
                         db_ver = (db_major, db_minor)
 
-                        if ( (not db_ver_inc_map.has_key(db_ver)) and
-                           (db_ver <= max_db_ver and db_ver >= min_db_ver) ):
+                        # Avoid 4.6 prior to 4.6.21 due to a BerkeleyDB bug
+                        if db_ver == (4, 6):
+                            m = re.search(r"#define\WDB_VERSION_PATCH\W(\d+)", f)
+                            db_patch = int(m.group(1))
+                            if db_patch < 21:
+                                print "db.h:", db_ver, "patch", db_patch,
+                                print "being ignored (4.6.x must be >= 4.6.21)"
+                                continue
+
+                        if ( (db_ver not in db_ver_inc_map) and
+                            allow_db_ver(db_ver) ):
                             # save the include directory with the db.h version
-                            # (first occurrance only)
+                            # (first occurrence only)
                             db_ver_inc_map[db_ver] = d
-                            print "db.h: found", db_ver, "in", d
+                            if db_setup_debug:
+                                print "db.h: found", db_ver, "in", d
                         else:
                             # we already found a header for this library version
                             if db_setup_debug: print "db.h: ignoring", d
                     else:
                         # ignore this header, it didn't contain a version number
-                        if db_setup_debug: print "db.h: unsupported version", db_ver, "in", d
+                        if db_setup_debug:
+                            print "db.h: no version number version in", d
 
             db_found_vers = db_ver_inc_map.keys()
             db_found_vers.sort()
@@ -611,14 +667,26 @@ class PyBuildExt(build_ext):
 
                 # check lib directories parallel to the location of the header
                 db_dirs_to_check = [
-                    os.path.join(db_incdir, '..', 'lib64'),
-                    os.path.join(db_incdir, '..', 'lib'),
-                    os.path.join(db_incdir, '..', '..', 'lib64'),
-                    os.path.join(db_incdir, '..', '..', 'lib'),
+                    db_incdir.replace("include", 'lib64'),
+                    db_incdir.replace("include", 'lib'),
                 ]
-                db_dirs_to_check = filter(os.path.isdir, db_dirs_to_check)
 
-                # Look for a version specific db-X.Y before an ambiguoius dbX
+                if sys.platform != 'darwin':
+                    db_dirs_to_check = filter(os.path.isdir, db_dirs_to_check)
+
+                else:
+                    # Same as other branch, but takes OSX SDK into account
+                    tmp = []
+                    for dn in db_dirs_to_check:
+                        if is_macosx_sdk_path(dn):
+                            if os.path.isdir(os.path.join(sysroot, dn[1:])):
+                                tmp.append(dn)
+                        else:
+                            if os.path.isdir(dn):
+                                tmp.append(dn)
+                    db_dirs_to_check = tmp
+
+                # Look for a version specific db-X.Y before an ambiguous dbX
                 # XXX should we -ever- look for a dbX name?  Do any
                 # systems really not name their library by version and
                 # symlink to more general names?
@@ -634,8 +702,9 @@ class PyBuildExt(build_ext):
                         if db_setup_debug: print "db lib: ", dblib, "not found"
 
         except db_found:
-            print "db lib: using", db_ver, dblib
-            if db_setup_debug: print "db: lib dir", dblib_dir, "inc dir", db_incdir
+            if db_setup_debug:
+                print "bsddb using BerkeleyDB lib:", db_ver, dblib
+                print "bsddb lib dir:", dblib_dir, " inc dir:", db_incdir
             db_incs = [db_incdir]
             dblibs = [dblib]
             # We add the runtime_library_dirs argument because the
@@ -645,6 +714,7 @@ class PyBuildExt(build_ext):
             # some unusual system configurations (e.g. the directory
             # is on an NFS server that goes away).
             exts.append(Extension('_bsddb', ['_bsddb.c'],
+                                  depends = ['bsddb.h'],
                                   library_dirs=dblib_dir,
                                   runtime_library_dirs=dblib_dir,
                                   include_dirs=db_incs,
@@ -728,13 +798,15 @@ class PyBuildExt(build_ext):
         # Curses support, requiring the System V version of curses, often
         # provided by the ncurses library.
         panel_library = 'panel'
+        ncursesw_incdirs = ["/usr/include/ncursesw"]
         if (self.compiler.find_library_file(lib_dirs, 'ncursesw')):
             curses_libs = ['ncursesw']
             # Bug 1464056: If _curses.so links with ncursesw,
             # _curses_panel.so must link with panelw.
             panel_library = 'panelw'
             exts.append( Extension('_curses', ['_cursesmodule.c'],
-                                   libraries = curses_libs) )
+                                   libraries = curses_libs,
+                                   include_dirs = ncursesw_incdirs) )
         elif (self.compiler.find_library_file(lib_dirs, 'ncurses')):
             curses_libs = ['ncurses']
             exts.append( Extension('_curses', ['_cursesmodule.c'],
@@ -757,8 +829,14 @@ class PyBuildExt(build_ext):
         if (module_enabled(exts, '_curses') and
             self.compiler.find_library_file(lib_dirs, panel_library)):
             exts.append( Extension('_curses_panel', ['_curses_panel.c'],
-                                   libraries = [panel_library] + curses_libs) )
+                                   libraries = [panel_library] + curses_libs,
+                                   include_dirs = ncursesw_incdirs) )
 
+        # Build `fpectl` module if Python is configured with --with-fpectl
+        data = open('pyconfig.h').read()
+        m = re.search(r"#\s*define\s+WANT_SIGFPE_HANDLER\s+1\s*", data)
+        if m is not None:
+            exts.append(Extension('fpectl', ['fpectlmodule.c']))
 
         # Andrew Kuchling's zlib module.  Note that some versions of zlib
         # 1.1.3 have security problems.  See CERT Advisory CA-2002-07:
