@@ -519,9 +519,6 @@ endif
 	ln -sf ../lib/python$(VER)/pdb.py $(d)/usr/bin/pdb$(VER)
 	cp -p debian/pdb.1 $(d)/usr/share/man/man1/pdb$(VER).1
 
-	: # versioned install only
-	rm -f $(d)/usr/bin/python-config
-
 ifeq ($(with_interp),static)
 	: # install the shared library
 	cp -p $(buildd_shared)/libpython$(VER).so.1.0 $(d)/usr/lib/
@@ -590,8 +587,7 @@ endif
 	DH_COMPAT=2 dh_movefiles -p$(p_dev) --sourcedir=$(d) \
 		usr/lib/python$(VER)/config \
 		usr/include/python$(VER) \
-		usr/lib/libpython$(VER).so \
-		usr/bin/python$(VER)-config
+		usr/lib/libpython$(VER).so
 	mv $(d_dev)/usr/lib/python$(VER)/config/Makefile \
 		$(d)/usr/lib/python$(VER)/config/
 	mv $(d_dev)/usr/include/python$(VER)/pyconfig.h \
@@ -608,6 +604,11 @@ ifeq (0,1)
 	mkdir $(d_dev)/usr/lib/python$(VER)/doc/api
 	cp -a Doc/api/refcounts.dat $(d_dev)/usr/lib/python$(VER)/doc/api/.
 endif
+
+	: # backported python-config script
+	sed -e "s,@EXENAME@,$(PY_INTERPRETER)," \
+		debian/python-config.in > $(d_dev)/usr/bin/$(PVER)-config
+	chmod 755 $(d_dev)/usr/bin/$(PVER)-config
 
 ifeq ($(with_tk),yes)
 	: # Move the Tkinter files into $(p_tk).
@@ -758,9 +759,8 @@ endif
 	cp -p debian/$(PVER)-dbg.README.Debian \
 		$(d_dbg)/usr/share/doc/$(p_base)/README.debug
 	cp -p $(buildd_debug)/python $(d_dbg)/usr/bin/$(PVER)-dbg
-	sed '1s,#!.*python[^ ]*\(.*\),#! $(PY_INTERPRETER)-dbg\1,' \
-		$(d)-dbg/usr/bin/$(PVER)-config \
-		> $(d_dbg)/usr/bin/$(PVER)-dbg-config
+	sed -e "s,@EXENAME@,$(PY_INTERPRETER)-dbg," \
+		debian/python-config.in > $(d_dbg)/usr/bin/$(PVER)-dbg-config
 	chmod 755 $(d_dbg)/usr/bin/$(PVER)-dbg-config
 	cp -p $(buildd_debug)/build/lib*/*_d.so \
 		$(d_dbg)/$(scriptdir)/lib-dynload/
