@@ -26,7 +26,7 @@ Description: An interactive high-level object-oriented language (version 2.4)
 
 Package: python2.4-minimal
 Architecture: any
-Priority: required
+Priority: optional
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: binfmt-support
 Conflicts: binfmt-support (<< 1.1.2)

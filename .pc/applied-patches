@@ -27,7 +27,6 @@ issue8329.diff
 CVE-2009-3560.diff
 CVE-2009-3720.diff
 difflib.diff
-distutils-debian.diff
 distutils-exec-prefix.diff
 fix-mailman-digests.diff
 ftp_nlst.diff

@@ -636,21 +636,21 @@ if test $enable_shared = "yes"; then
   AC_DEFINE(Py_ENABLE_SHARED, 1, [Defined if Python is built as a shared library.])
   case $ac_sys_system in
     BeOS*)
-          LDLIBRARY='libpython$(VERSION).so'
+          LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).so'
           ;;
     CYGWIN*)
-          LDLIBRARY='libpython$(VERSION).dll.a'
-          DLLLIBRARY='libpython$(VERSION).dll'
+          LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).dll.a'
+          DLLLIBRARY='libpython$(VERSION)$(DEBUG_EXT).dll'
           ;;
     SunOS*)
-	  LDLIBRARY='libpython$(VERSION).so'
-	  BLDLIBRARY='-Wl,-R,$(LIBDIR) -L. -lpython$(VERSION)'
+	  LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).so'
+	  BLDLIBRARY='-Wl,-R,$(LIBDIR) -L. -lpython$(VERSION)$(DEBUG_EXT)'
 	  RUNSHARED=LD_LIBRARY_PATH=`pwd`:${LD_LIBRARY_PATH}
 	  INSTSONAME="$LDLIBRARY".$SOVERSION
           ;;
     Linux*|GNU*|NetBSD*|FreeBSD*|DragonFly*)
-	  LDLIBRARY='libpython$(VERSION).so'
-	  BLDLIBRARY='-L. -lpython$(VERSION)'
+	  LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).so'
+	  BLDLIBRARY='-L. -lpython$(VERSION)$(DEBUG_EXT)'
 	  RUNSHARED=LD_LIBRARY_PATH=`pwd`:${LD_LIBRARY_PATH}
 	  case $ac_sys_system in
 	      FreeBSD*)
@@ -660,18 +660,18 @@ if test $enable_shared = "yes"; then
 	  INSTSONAME="$LDLIBRARY".$SOVERSION
 	  ;;
     hp*|HP*)
-	  LDLIBRARY='libpython$(VERSION).sl'
-	  BLDLIBRARY='-Wl,+b,$(LIBDIR) -L. -lpython$(VERSION)'
+	  LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).sl'
+	  BLDLIBRARY='-Wl,+b,$(LIBDIR) -L. -lpython$(VERSION)$(DEBUG_EXT)'
 	  RUNSHARED=SHLIB_PATH=`pwd`:${SHLIB_PATH}
 	  ;;
     OSF*)
-	  LDLIBRARY='libpython$(VERSION).so'
-	  BLDLIBRARY='-rpath $(LIBDIR) -L. -lpython$(VERSION)'
+	  LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).so'
+	  BLDLIBRARY='-rpath $(LIBDIR) -L. -lpython$(VERSION)$(DEBUG_EXT)'
 	  RUNSHARED=LD_LIBRARY_PATH=`pwd`:${LD_LIBRARY_PATH}
 	  ;;
     atheos*)
-	  LDLIBRARY='libpython$(VERSION).so'
-	  BLDLIBRARY='-L. -lpython$(VERSION)'
+	  LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).so'
+	  BLDLIBRARY='-L. -lpython$(VERSION)$(DEBUG_EXT)'
 	  RUNSHARED=DLL_PATH=`pwd`:${DLL_PATH:-/atheos/sys/libs:/atheos/autolnk/lib}
 	  ;;
   esac
@@ -679,7 +679,7 @@ else # shared is disabled
   case $ac_sys_system in
     CYGWIN*)
           BLDLIBRARY='$(LIBRARY)'
-          LDLIBRARY='libpython$(VERSION).dll.a'
+          LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).dll.a'
           ;;
   esac
 fi

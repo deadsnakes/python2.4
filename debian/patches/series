@@ -28,7 +28,6 @@ issue8329.diff
 CVE-2009-3560.diff
 CVE-2009-3720.diff
 difflib.diff
-distutils-debian.diff
 distutils-exec-prefix.diff
 fix-mailman-digests.diff
 ftp_nlst.diff
@@ -60,3 +59,4 @@ deadsnakes-libdb-versions.diff
 deadsnakes-ncursesw-include-dir.diff
 deadsnakes-add-profile-pstats.diff
 deadsnakes-fix-debug-ext.diff
+
