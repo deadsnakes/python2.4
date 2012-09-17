@@ -902,7 +902,6 @@
  _Py_cobject_hack@Base @VER@
  _Py_delbitset@Base @VER@
  _Py_findlabel@Base @VER@
- (arch=i386 lpia)_Py_force_double@Base @VER@
  _Py_mergebitset@Base @VER@
  _Py_meta_grammar@Base @VER@
  _Py_newbitset@Base @VER@

@@ -8,8 +8,8 @@ Forwarded: no
          lib_dirs = self.compiler.library_dirs + [
              '/lib64', '/usr/lib64',
              '/lib', '/usr/lib',
-+            '/lib/%s' % os.getenv('DEB_BUILD_MULTIARCH'),
-+            '/usr/lib/%s' % os.getenv('DEB_BUILD_MULTIARCH')
++            '/lib/%s' % os.getenv('DEB_HOST_MULTIARCH'),
++            '/usr/lib/%s' % os.getenv('DEB_HOST_MULTIARCH')
              ]
          inc_dirs = self.compiler.include_dirs + ['/usr/include']
          gnu_triplet = os.popen('dpkg-architecture -qDEB_HOST_GNU_TYPE').readline()[:-1]; print 'XXX', gnu_triplet

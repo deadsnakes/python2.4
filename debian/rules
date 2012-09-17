@@ -13,6 +13,7 @@ DEB_BUILD_OPTIONS := "nocheck nobench"
 
 DEB_HOST_ARCH		?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 DEB_HOST_ARCH_OS	?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+DEB_HOST_ARCH_BITS	?= $(shell dpkg-architecture -qDEB_HOST_ARCH_BITS)
 
 changelog_values := $(shell dpkg-parsechangelog \
 			| awk '/^(Version|Source):/ {print $$2}')
@@ -48,7 +49,7 @@ export PVER=python2.4
 export PRIORITY=$(shell echo $(VER) | tr -d '.')0
 
 # For setup.py to feast upon.
-export DEB_BUILD_MULTIARCH=$(shell dpkg-architecture -qDEB_BUILD_MULTIARCH)
+export DEB_HOST_MULTIARCH=$(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
 PREVVER	:= $(shell awk '/^python/ && NR > 1 {print substr($$2,2,length($$2)-2); exit}' debian/changelog)
 
@@ -101,10 +102,6 @@ endif
 with_fpectl = yes
 
 CC = gcc
-ifneq ($(CC),gcc)
-  GCCBDEP =, gcc-4.1
-  GCCDEP =, $(CC)
-endif
 
 # on alpha, use -O2 only, use -mieee
 ifeq ($(DEB_HOST_ARCH),alpha)
@@ -212,7 +209,14 @@ common_configure_args = \
 		--prefix=/usr \
 		--enable-ipv6 \
 		--enable-unicode=ucs4 \
+		--with-system-expat \
 		--with-dbmliborder=bdb:gdbm
+
+ifeq ($(DEB_HOST_ARCH), avr32)
+  common_configure_args += --without-ffi
+else
+  common_configure_args += --with-system-ffi
+endif
 
 ifeq ($(with_fpectl),yes)
   common_configure_args += \
@@ -355,6 +359,9 @@ ifeq (,$(wildcard /dev/dsp))
 endif
 ifneq (,$(filter $(DEB_HOST_ARCH), hppa))
   TEST_EXCLUDES += test_fork1 test_socketserver test_threading test_wait3 test_wait4 test_gdb
+endif
+ifneq (,$(filter $(DEB_HOST_ARCH), arm avr32))
+  TEST_EXCLUDES += test_ctypes
 endif
 ifneq (,$(filter $(DEB_HOST_ARCH), m68k avr32))
   TEST_EXCLUDES += test_bsddb3
@@ -571,7 +578,7 @@ stamps/stamp-control:
 		  <$$f >$$f2; \
 	  fi; \
 	done
-#ifneq (,$(filter $(DEB_HOST_ARCH), alpha amd64 ia64 ppc64 sparc64 kfreebsd-amd64))
+#ifeq ($(DEB_HOST_ARCH_BITS),64)
 #	sed -i 's/\(Py_InitModule4[^@]*\)@/\1_64@/' \
 #		debian/lib$(PVER).symbols debian/$(PVER)-dbg.symbols
 #endif
@@ -631,7 +638,7 @@ endif
 		$(d)/$(scriptdir)/lib-dynload/Python-$(VER).egg-info
 
 	: # Remove python2 binary.
-	rm -f $(d)/usr/bin/python2
+	rm -f $(d)/usr/bin/python2 $(d)/usr/bin/python2-config
 
 	dh_installdirs -p$(p_lib) \
 		$(scriptdir)/config \
