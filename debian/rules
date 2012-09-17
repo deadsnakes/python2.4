@@ -602,6 +602,7 @@ endif
 
 	: # remove files which are not packaged
 	rm -f $(d)/usr/bin/smtpd.py
+	rm -f $(d)/usr/lib/pkgconfig/python.pc
 
 	: # fix some file permissions
 	chmod a-x $(d)/$(scriptdir)/lib-tk/Tix.py
@@ -704,6 +705,7 @@ endif
 		usr/lib/python$(VER)/config \
 		usr/include/python$(VER) \
 		usr/lib/libpython$(VER).so \
+		usr/lib/pkgconfig/python-$(VER).pc \
 		usr/lib/python$(VER)/distutils/command/wininst-*.exe
 
 	dh_link -p$(p_dev) usr/lib/python$(VER)/config/libpython$(VER).a \
@@ -866,10 +868,10 @@ endif
 	cp -p $(buildd_shdebug)/libpython$(VER)_d.so.1.0 $(d_dbg)/usr/lib/
 	ln -sf libpython$(VER)_d.so.1.0 $(d_dbg)/usr/lib/libpython$(VER)_d.so.1
 	ln -sf libpython$(VER)_d.so.1 $(d_dbg)/usr/lib/libpython$(VER)_d.so
-	#sed -e '/^Libs:/s,-lpython$(VER),-lpython$(VER)_d,' \
-	#  -e '/^Cflags:/s,python$(VER),python$(VER)_d,' \
-	#  $(d)-dbg/usr/lib/pkgconfig/python-$(VER).pc \
-	#  > $(d_dbg)/usr/lib/pkgconfig/python-$(VER)-dbg.pc
+	sed -e '/^Libs:/s,-lpython$(VER),-lpython$(VER)_d,' \
+	  -e '/^Cflags:/s,python$(VER),python$(VER)_d,' \
+	  $(d)-dbg/usr/lib/pkgconfig/python-$(VER).pc \
+	  > $(d_dbg)/usr/lib/pkgconfig/python-$(VER)-dbg.pc
 	
 ifeq ($(with_gdbm),yes)
 	# move debug files to corresponding debug package

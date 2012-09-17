@@ -3280,7 +3280,7 @@ done
 AC_MSG_RESULT(done)
 
 # generate output files
-AC_CONFIG_FILES(Makefile.pre Modules/Setup.config Misc/python.pc)
+AC_CONFIG_FILES(Makefile.pre Modules/Setup.config)
 AC_OUTPUT
 
 echo "creating Setup"

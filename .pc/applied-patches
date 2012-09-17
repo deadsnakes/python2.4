@@ -49,3 +49,4 @@ deadsnakes-libdb-versions.diff
 deadsnakes-ncursesw-include-dir.diff
 deadsnakes-add-profile-pstats.diff
 deadsnakes-fix-debug-ext.diff
+deadsnakes-backport-pkg-config-support.diff
