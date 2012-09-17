@@ -857,6 +857,7 @@ endif
 	cp -p debian/$(PVER)-dbg.README.Debian \
 		$(d_dbg)/usr/share/doc/$(p_base)/README.debug
 	cp -p $(buildd_debug)/python $(d_dbg)/usr/bin/$(PVER)-dbg
+	: # install backported $(PVER)-dbg-config
 	sed -e "s,@EXENAME@,$(PY_INTERPRETER)-dbg," \
 		debian/python-config.in > $(d_dbg)/usr/bin/$(PVER)-dbg-config
 	chmod 755 $(d_dbg)/usr/bin/$(PVER)-dbg-config
