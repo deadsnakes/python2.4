@@ -10,8 +10,9 @@ python2.4 (2.4.6-4+natty1) natty; urgency=low
     - Built against newer libdb versions.
     - Probably other small stuff.
   * Backported pkg-config support (see Python issue #3585).
+  * Fix static debug library.
 
- -- Felix Krull <f_krull@gmx.de>  Mon, 17 Sep 2012 18:21:33 +0200
+ -- Felix Krull <f_krull@gmx.de>  Tue, 18 Sep 2012 16:19:25 +0200
 
 python2.4 (2.4.6-2~ppa9~natty1) natty; urgency=low
 
