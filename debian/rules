@@ -209,14 +209,6 @@ common_configure_args = \
 		--prefix=/usr \
 		--enable-ipv6 \
 		--enable-unicode=ucs4 \
-		--with-system-expat \
-		--with-dbmliborder=bdb:gdbm
-
-ifeq ($(DEB_HOST_ARCH), avr32)
-  common_configure_args += --without-ffi
-else
-  common_configure_args += --with-system-ffi
-endif
 
 ifeq ($(with_fpectl),yes)
   common_configure_args += \
