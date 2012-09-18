@@ -1,0 +1,51 @@
+# DP: Fix issues with readline6
+--- a/configure.in
++++ b/configure.in
+@@ -3006,6 +3006,10 @@
+   [readline/readline.h],
+   AC_DEFINE(HAVE_RL_COMPLETION_APPEND_CHARACTER, 1,
+   [Define if you have readline 2.2]), )
++  AC_EGREP_HEADER([extern int rl_completion_suppress_append;],
++  [readline/readline.h],
++  AC_DEFINE(HAVE_RL_COMPLETION_SUPPRESS_APPEND, 1,
++  [Define if you have rl_completion_suppress_append]), )
+ fi
+ 
+ # check for readline 4.0
+--- a/Modules/readline.c
++++ b/Modules/readline.c
+@@ -676,6 +676,12 @@
+ static char **
+ flex_complete(char *text, int start, int end)
+ {
++#ifdef HAVE_RL_COMPLETION_APPEND_CHARACTER
++	rl_completion_append_character ='\0';
++#endif
++#ifdef HAVE_RL_COMPLETION_SUPPRESS_APPEND
++	rl_completion_suppress_append = 0;
++#endif
+ 	Py_XDECREF(begidx);
+ 	Py_XDECREF(endidx);
+ 	begidx = PyInt_FromLong((long) start);
+@@ -718,9 +724,6 @@
+ 	rl_completer_word_break_characters =
+ 		strdup(" \t\n`~!@#$%^&*()-=+[{]}\\|;:'\",<>/?");
+ 		/* All nonalphanums except '.' */
+-#ifdef HAVE_RL_COMPLETION_APPEND_CHARACTER
+-	rl_completion_append_character ='\0';
+-#endif
+ 
+ 	begidx = PyInt_FromLong(0L);
+ 	endidx = PyInt_FromLong(0L);
+--- a/pyconfig.h.in
++++ b/pyconfig.h.in
+@@ -377,6 +377,9 @@
+ /* Define if you have readline 4.2 */
+ #undef HAVE_RL_COMPLETION_MATCHES
+ 
++/* Define if you have rl_completion_suppress_append */
++#undef HAVE_RL_COMPLETION_SUPPRESS_APPEND
++
+ /* Define if you have readline 4.0 */
+ #undef HAVE_RL_PRE_INPUT_HOOK
+ 

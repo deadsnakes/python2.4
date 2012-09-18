@@ -18,6 +18,11 @@ On other platforms (mainly Mac and Windows), it uses just sys.prefix
 resulting directories, if they exist, are appended to sys.path, and
 also inspected for path configuration files.
 
+FOR DEBIAN, this sys.path is augmented with directories in /usr/local.
+Local addons go into /usr/local/lib/python<version>/site-packages
+(resp. /usr/local/lib/site-python), Debian addons install into
+/usr/lib/python<version>/site-packages.
+
 A path configuration file is a file whose name has the form
 <package>.pth; its contents are additional directories (one per line)
 to be added to sys.path.  Non-existing directories (or
@@ -98,7 +103,7 @@ def addbuilddir():
     """Append ./build/lib.<platform> in case we're running in the build dir
     (especially for Guido :-)"""
     from distutils.util import get_platform
-    s = "build/lib.%s-%.3s" % (get_platform(), sys.version)
+    s = "build/lib%s.%s-%.3s" % (sys.pydebug and '_d' or '', get_platform(), sys.version)
     s = os.path.join(os.path.dirname(sys.path[-1]), s)
     sys.path.append(s)
 
@@ -173,6 +178,7 @@ def addsitepackages(known_paths):
     prefixes = [sys.prefix]
     if sys.exec_prefix != sys.prefix:
         prefixes.append(sys.exec_prefix)
+    prefixes.insert(0, '/usr/local')
     for prefix in prefixes:
         if prefix:
             if sys.platform in ('os2emx', 'riscos'):
@@ -393,6 +399,14 @@ def main():
     # this module is run as a script, because this code is executed twice.
     if hasattr(sys, "setdefaultencoding"):
         del sys.setdefaultencoding
+    # install the apport exception handler if available
+    try:
+        import apport_python_hook
+    except ImportError:
+        pass
+    else:
+        apport_python_hook.install()
+
 
 main()
 

@@ -1,0 +1,15 @@
+# DP: Fix python2.5 / tk8.5 incompatibility (http://bugs.python.org/issue2693)
+--- a/Lib/idlelib/WidgetRedirector.py
++++ b/Lib/idlelib/WidgetRedirector.py
+@@ -53,7 +53,10 @@
+             if m:
+                 return m(*args)
+             else:
+-                return self.tk.call((self.orig, cmd) + args)
++                result = self.tk.call((self.orig, cmd) + args)
++                if isinstance(result, tuple):
++                    result = '{%s}' % '} {'.join(map(str, result))
++                return result
+         except TclError:
+             return ""
+ 
