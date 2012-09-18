@@ -309,6 +309,18 @@ for each thread.
   % thread.interrupt_main() (used from IDLE), so it's still needed.
 \end{cfuncdesc}
 
+\begin{cfuncdesc}{void}{PyErr_SetWakeupFd}{int fd}
+  This utility function specifies a file descriptor to which a
+  \code{\\0} byte will be written whenever a signal is received.  It
+  returns the previous such file descriptor.  The value \code{-1}
+  disables the feature; this is the initial state.  This is equivalent
+  to \module{signal}.\function{set_wakeup_fd} in Python, but without
+  any error checking.  \var{fd} should be a valid file descriptor.
+  The function should only be called from the main thread.
+
+  This is an Ubuntu specific addition, backported from 2.6.
+\end{cfuncdesc}
+
 \begin{cfuncdesc}{PyObject*}{PyErr_NewException}{char *name,
                                                  PyObject *base,
                                                  PyObject *dict}

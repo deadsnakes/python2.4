@@ -1,0 +1,23 @@
+# DP: Fix Lib/calendar.py, broken title tag
+--- a/Lib/calendar.py
++++ b/Lib/calendar.py
+@@ -473,7 +473,7 @@
+         a('<meta http-equiv="Content-Type" content="text/html; charset=%s" />\n' % encoding)
+         if css is not None:
+             a('<link rel="stylesheet" type="text/css" href="%s" />\n' % css)
+-        a('<title>Calendar for %d</title\n' % theyear)
++        a('<title>Calendar for %d</title>\n' % theyear)
+         a('</head>\n')
+         a('<body>\n')
+         a(self.formatyear(theyear, width))
+--- a/Lib/test/test_calendar.py
++++ b/Lib/test/test_calendar.py
+@@ -49,7 +49,7 @@
+ <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=ascii" />
+ <link rel="stylesheet" type="text/css" href="calendar.css" />
+-<title>Calendar for 2004</title
++<title>Calendar for 2004</title>
+ </head>
+ <body>
+ <table border="0" cellpadding="0" cellspacing="0" class="year">

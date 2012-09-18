@@ -1,9 +1,37 @@
+python2.4 (2.4.6-4+natty1) natty; urgency=low
+
+  * New version number scheme.
+  * Imported packaging from python2.5 package. As a consequence, a number
+    of changes were imported from that package:
+    - Added implementation of PEP 370, "Per user site-packages directory"
+    - Added libpython2.4 package.
+    - Added python2.4-complete package.
+    - Fixed some package names which were still wrong.
+    - Built against newer libdb versions.
+    - Probably other small stuff.
+  * Backported pkg-config support (see Python issue #3585).
+  * Fix static debug library.
+
+ -- Felix Krull <f_krull@gmx.de>  Tue, 18 Sep 2012 16:19:25 +0200
+
+python2.4 (2.4.6-2~ppa9~natty1) natty; urgency=low
+
+  * Imported from Lucid package.
+
+ -- Felix Krull <f_krull@gmx.de>  Fri, 05 Aug 2011 17:42:58 +0200
+
 python2.4 (2.4.6-2~ppa9~lucid1) lucid; urgency=low
 
   * Forgot to include copyright notice for `profile` and `pstats` modules in
     debian/copyright.
 
  -- Felix Krull <f_krull@gmx.de>  Fri, 05 Aug 2011 17:23:49 +0200
+
+python2.4 (2.4.6-2~ppa8~natty1) natty; urgency=low
+
+  * Imported from Lucid package.
+
+ -- Felix Krull <f_krull@gmx.de>  Thu, 04 Aug 2011 21:27:06 +0200
 
 python2.4 (2.4.6-2~ppa8~lucid1) lucid; urgency=low
 
@@ -15,14 +43,28 @@ python2.4 (2.4.6-2~ppa8~lucid1) lucid; urgency=low
 
  -- Felix Krull <f_krull@gmx.de>  Thu, 04 Aug 2011 19:24:57 +0200
 
-python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa7~lucid1) lucid; urgency=low
+python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa7~natty2) natty; urgency=low
+
+  * Fix library search (and therefore building) on i386.
+
+ -- Felix Krull <f_krull@gmx.de>  Fri, 15 Apr 2011 22:35:09 +0200
+
+python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa7~natty1) natty; urgency=low
+
+  * Imported from Maverick.
+  * Made documentation build with emacs23 since emacs22 isn't in Natty anymore.
+  * Add new Natty library directories to library search path so libraries in
+    there are actually found.
+
+ -- Felix Krull <f_krull@gmx.de>  Fri, 15 Apr 2011 18:11:44 +0200
+
+python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa7~maverick1) maverick; urgency=low
 
   * Fix documentation build.
     - Mostly by merging large chunks of the python2.5 debian/rules which
       is in a better state in that regard.
-  * Conflict old python-tk-deadsnakes and friends.
 
- -- Felix Krull <f_krull@gmx.de>  Tue, 14 Sep 2010 19:12:20 +0200
+ -- Felix Krull <f_krull@gmx.de>  Tue, 14 Sep 2010 18:48:11 +0200
 
 python2.4 (2.4.6-1ubuntu3.2.9.10.1~ppa6~maverick1) maverick; urgency=low
 

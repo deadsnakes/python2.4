@@ -1069,6 +1069,11 @@ _PySys_Init(void)
 	SET_SYS_FROM_STRING("winver",
 			    PyString_FromString(PyWin_DLLVersionString));
 #endif
+#ifdef Py_DEBUG
+	PyDict_SetItemString(sysdict, "pydebug", Py_True);
+#else
+	PyDict_SetItemString(sysdict, "pydebug", Py_False);
+#endif
 #undef SET_SYS_FROM_STRING
 	if (warnoptions == NULL) {
 		warnoptions = PyList_New(0);

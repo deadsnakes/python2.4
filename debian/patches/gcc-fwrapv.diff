@@ -1,0 +1,29 @@
+# DP: use -fwrapv when GCC supports it.
+
+--- a/configure.in
++++ b/configure.in
+@@ -752,6 +752,10 @@
+ then
+     case $GCC in
+     yes)
++        # For gcc 4.x we need to use -fwrapv so lets check if its supported
++        if "$CC" -v --help 2>/dev/null |grep -- -fwrapv > /dev/null; then
++           WRAP="-fwrapv"
++        fi
+ 	case $ac_cv_prog_cc_g in
+ 	yes)
+ 	    if test "$Py_DEBUG" = 'true' ; then
+@@ -759,11 +763,11 @@
+ 		# debug builds.
+ 		OPT="-g -Wall -Wstrict-prototypes"
+ 	    else
+-		OPT="-g -O3 -Wall -Wstrict-prototypes"
++		OPT="-g $WRAP -O3 -Wall -Wstrict-prototypes"
+ 	    fi
+ 	    ;;
+ 	*)
+-	    OPT="-O3 -Wall -Wstrict-prototypes"
++	    OPT="$WRAP -O3 -Wall -Wstrict-prototypes"
+ 	    ;;
+ 	esac
+ 	case $ac_sys_system in

@@ -1,0 +1,13 @@
+# DP: Fix building the source within exec_prefix.
+
+--- a/Lib/distutils/command/build_ext.py
++++ b/Lib/distutils/command/build_ext.py
+@@ -186,7 +186,7 @@
+         # for extensions under Cygwin and AtheOS Python's library directory must be
+         # appended to library_dirs
+         if sys.platform[:6] == 'cygwin' or sys.platform[:6] == 'atheos':
+-            if string.find(sys.executable, sys.exec_prefix) != -1:
++            if sys.executable.startswith(os.path.join(sys.exec_prefix, 'bin')):
+                 # building third party extensions
+                 self.library_dirs.append(os.path.join(sys.prefix, "lib",
+                                                       "python" + get_python_version(),

@@ -1,0 +1,23 @@
+# DP: distutils: Add an option --install-layout=deb, which is ignored for 2.5.
+--- a/Lib/distutils/command/install.py
++++ b/Lib/distutils/command/install.py
+@@ -135,6 +135,9 @@
+ 
+         ('record=', None,
+          "filename in which to record list of installed files"),
++
++        ('install-layout=', None,
++         "installation layout to choose (known values: deb)"),
+         ]
+ 
+     boolean_options = ['compile', 'force', 'skip-build']
+@@ -167,6 +170,9 @@
+         self.install_scripts = None
+         self.install_data = None
+ 
++        # enable custom installation, known values: deb, IGNORED in 2.5
++        self.install_layout = None
++
+         self.compile = None
+         self.optimize = None
+ 

@@ -1,0 +1,16 @@
+# DP: Remove duplicate PyCallable_Check declaration.
+
+--- a/Include/abstract.h
++++ b/Include/abstract.h
+@@ -283,9 +283,10 @@
+ 
+        */
+ 
++       /* Declared elsewhere
++
+      PyAPI_FUNC(int) PyCallable_Check(PyObject *o);
+ 
+-       /*
+ 	 Determine if the object, o, is callable.  Return 1 if the
+ 	 object is callable and 0 otherwise.
+ 

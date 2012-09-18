@@ -149,16 +149,36 @@ def main(args=None):
     not specified) are compiled and the resulting bytecode is cached
     in the normal manner.  This function does not search a directory
     structure to locate source files; it only compiles files named
-    explicitly.
+    explicitly.  If '-' is the only parameter in args, the list of
+    files is taken from standard input.
 
     """
     if args is None:
         args = sys.argv[1:]
-    for filename in args:
-        try:
-            compile(filename, doraise=True)
-        except PyCompileError,err:
-            sys.stderr.write(err.msg)
+    rv = 0
+    if args == ['-']:
+        while True:
+            filename = sys.stdin.readline()
+            if not filename:
+                break
+            filename = filename.rstrip('\n')
+            try:
+                compile(filename, doraise=True)
+            except PyCompileError, error:
+                rv = 1
+                sys.stderr.write("%s\n" % error.msg)
+            except IOError, error:
+                rv = 1
+                sys.stderr.write("%s\n" % error)
+    else:
+        for filename in args:
+            try:
+                compile(filename, doraise=True)
+            except PyCompileError, error:
+                # return value to indicate at least one failure
+                rv = 1
+                sys.stderr.write(error.msg)
+    return rv
 
 if __name__ == "__main__":
     main()

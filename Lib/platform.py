@@ -217,6 +217,10 @@ def _dist_try_harder(distname,version,id):
 _release_filename = re.compile(r'(\w+)[-_](release|version)')
 _release_version = re.compile(r'([\d.]+)[^(]*(?:\((.+)\))?')
 
+_distributor_id_file_re = re.compile("(?:DISTRIB_ID\s*=)\s*(.*)", re.I)
+_release_file_re = re.compile("(?:DISTRIB_RELEASE\s*=)\s*(.*)", re.I)
+_codename_file_re = re.compile("(?:DISTRIB_CODENAME\s*=)\s*(.*)", re.I)
+
 def dist(distname='',version='',id='',
 
          supported_dists=('SuSE','debian','redhat','mandrake')):
@@ -231,11 +235,49 @@ def dist(distname='',version='',id='',
         args given as parameters.
 
     """
+    # check for the Debian/Ubuntu /etc/lsb-release file first, needed so
+    # that the distribution doesn't get identified as Debian.
+    try:
+        etclsbrel = open("/etc/lsb-release", "rU")
+        for line in etclsbrel:
+            m = _distributor_id_file_re.search(line)
+            if m:
+                _u_distname = m.group(1).strip()
+            m = _release_file_re.search(line)
+            if m:
+                _u_version = m.group(1).strip()
+            m = _codename_file_re.search(line)
+            if m:
+                _u_id = m.group(1).strip()
+        if _u_distname and _u_version:
+            return (_u_distname, _u_version, _u_id)
+    except (EnvironmentError, UnboundLocalError):
+            pass
+
     try:
         etc = os.listdir('/etc')
     except os.error:
         # Probably not a Unix system
         return distname,version,id
+
+    if os.path.exists('/etc/lsb-release'):
+        for line in open('/etc/lsb-release'):
+            line = line.strip()
+            if not line:
+                continue
+            var, arg = line.split('=', 1)
+            if var.startswith('DISTRIB_'):
+                var = var[8:]
+                if arg.startswith('"') and arg.endswith('"'):
+                    arg = arg[1:-1]
+                if var == 'ID':
+                    distname = arg
+                elif var == 'RELEASE':
+                    version = arg
+                elif var == 'CODENAME':
+                    id = arg
+        return distname,version,id
+
     for file in etc:
         m = _release_filename.match(file)
         if m:
