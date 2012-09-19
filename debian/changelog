@@ -1,3 +1,9 @@
+python2.4 (2.4.6-4+quantal1) quantal; urgency=low
+
+  * Imported from Precise package.
+
+ -- Felix Krull <f_krull@gmx.de>  Wed, 19 Sep 2012 23:10:04 +0200
+
 python2.4 (2.4.6-4+precise1) precise; urgency=low
 
   * Imported from Lucid package.
