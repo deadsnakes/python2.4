@@ -65,7 +65,8 @@ def get_python_inc(plat_specific=0, prefix=None):
                 if not os.path.exists(inc_dir):
                     inc_dir = os.path.join(os.path.dirname(base), "Include")
             return inc_dir
-        return os.path.join(prefix, "include", "python" + sys.version[:3])
+        return os.path.join(prefix, "include",
+                            "python" + sys.version[:3] + (sys.pydebug and '_d' or ''))
     elif os.name == "nt":
         return os.path.join(prefix, "include")
     elif os.name == "mac":
@@ -146,8 +147,9 @@ def customize_compiler(compiler):
     varies across Unices and is stored in Python's Makefile.
     """
     if compiler.compiler_type == "unix":
-        (cc, cxx, opt, basecflags, ccshared, ldshared, so_ext) = \
-            get_config_vars('CC', 'CXX', 'OPT', 'BASECFLAGS', 'CCSHARED', 'LDSHARED', 'SO')
+        (cc, cxx, opt, extra_cflags, basecflags, cflags, ccshared, ldshared, so_ext) = \
+            get_config_vars('CC', 'CXX', 'OPT', 'EXTRA_CFLAGS', 'BASECFLAGS', 'CFLAGS',
+                            'CCSHARED', 'LDSHARED', 'SO')
 
         if os.environ.has_key('CC'):
             cc = os.environ['CC']
@@ -161,11 +163,15 @@ def customize_compiler(compiler):
             cpp = cc + " -E"           # not always
         if os.environ.has_key('LDFLAGS'):
             ldshared = ldshared + ' ' + os.environ['LDFLAGS']
-        if basecflags:
-            opt = basecflags + ' ' + opt
+        if os.environ.has_key('BASECFLAGS'):
+            basecflags = os.environ['BASECFLAGS']
+        if os.environ.has_key('EXTRA_CFLAGS'):
+            extra_cflags = os.environ['EXTRA_CFLAGS']
+        if os.environ.has_key('OPT'):
+            opt = os.environ['OPT']
+        cflags = ' '.join(str(x) for x in (basecflags, opt, extra_cflags) if x)
         if os.environ.has_key('CFLAGS'):
-            opt = opt + ' ' + os.environ['CFLAGS']
-            ldshared = ldshared + ' ' + os.environ['CFLAGS']
+            cflags = ' '.join(str(x) for x in (basecflags, opt, os.environ['CFLAGS'], extra_cflags) if x)
         if os.environ.has_key('CPPFLAGS'):
             cpp = cpp + ' ' + os.environ['CPPFLAGS']
             opt = opt + ' ' + os.environ['CPPFLAGS']
@@ -202,7 +208,7 @@ def get_makefile_filename():
     if python_build:
         return os.path.join(os.path.dirname(sys.executable), "Makefile")
     lib_dir = get_python_lib(plat_specific=1, standard_lib=1)
-    return os.path.join(lib_dir, "config", "Makefile")
+    return os.path.join(lib_dir, "config" + (sys.pydebug and "_d" or ""), "Makefile")
 
 
 def parse_config_h(fp, g=None):

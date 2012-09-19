@@ -53,7 +53,10 @@ class WidgetRedirector:
             if m:
                 return m(*args)
             else:
-                return self.tk.call((self.orig, cmd) + args)
+                result = self.tk.call((self.orig, cmd) + args)
+                if isinstance(result, tuple):
+                    result = '{%s}' % '} {'.join(map(str, result))
+                return result
         except TclError:
             return ""
 

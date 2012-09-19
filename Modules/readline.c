@@ -676,6 +676,12 @@ on_completion(char *text, int state)
 static char **
 flex_complete(char *text, int start, int end)
 {
+#ifdef HAVE_RL_COMPLETION_APPEND_CHARACTER
+	rl_completion_append_character ='\0';
+#endif
+#ifdef HAVE_RL_COMPLETION_SUPPRESS_APPEND
+	rl_completion_suppress_append = 0;
+#endif
 	Py_XDECREF(begidx);
 	Py_XDECREF(endidx);
 	begidx = PyInt_FromLong((long) start);
@@ -718,9 +724,6 @@ setup_readline(void)
 	rl_completer_word_break_characters =
 		strdup(" \t\n`~!@#$%^&*()-=+[{]}\\|;:'\",<>/?");
 		/* All nonalphanums except '.' */
-#ifdef HAVE_RL_COMPLETION_APPEND_CHARACTER
-	rl_completion_append_character ='\0';
-#endif
 
 	begidx = PyInt_FromLong(0L);
 	endidx = PyInt_FromLong(0L);

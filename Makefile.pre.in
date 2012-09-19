@@ -88,8 +88,8 @@ SCRIPTDIR=	$(prefix)/lib
 # Detailed destination directories
 BINLIBDEST=	$(LIBDIR)/python$(VERSION)
 LIBDEST=	$(SCRIPTDIR)/python$(VERSION)
-INCLUDEPY=	$(INCLUDEDIR)/python$(VERSION)
-CONFINCLUDEPY=	$(CONFINCLUDEDIR)/python$(VERSION)
+INCLUDEPY=	$(INCLUDEDIR)/python$(VERSION)$(DEBUG_EXT)
+CONFINCLUDEPY=	$(CONFINCLUDEDIR)/python$(VERSION)$(DEBUG_EXT)
 LIBP=		$(LIBDIR)/python$(VERSION)
 
 # Symbols used for using shared libraries
@@ -101,6 +101,8 @@ DESTSHARED=	$(BINLIBDEST)/lib-dynload
 # Executable suffix (.exe on Windows and Mac OS X)
 EXE=		@EXEEXT@
 BUILDEXE=	@BUILDEXEEXT@
+
+DEBUG_EXT=	@DEBUG_EXT@
 
 # Short name and location for Mac OS X Python framework
 UNIVERSALSDK=@UNIVERSALSDK@
@@ -353,7 +355,7 @@ $(LIBRARY): $(LIBRARY_OBJS)
 	$(AR) cr $@ $(MODOBJS)
 	$(RANLIB) $@
 
-libpython$(VERSION).so: $(LIBRARY_OBJS)
+libpython$(VERSION)$(DEBUG_EXT).so: $(LIBRARY_OBJS)
 	if test $(INSTSONAME) != $(LDLIBRARY); then \
 		$(LDSHARED) -Wl,-h$(INSTSONAME) -o $(INSTSONAME) $(LIBRARY_OBJS) $(SHLIBS) $(LIBC) $(LIBM); \
 		$(LN) -f $(INSTSONAME) $@; \
@@ -361,7 +363,7 @@ libpython$(VERSION).so: $(LIBRARY_OBJS)
 		$(LDSHARED) -o $@ $(LIBRARY_OBJS) $(SHLIBS) $(LIBC) $(LIBM); \
 	fi
 
-libpython$(VERSION).sl: $(LIBRARY_OBJS)
+libpython$(VERSION)$(DEBUG_EXT).sl: $(LIBRARY_OBJS)
 	$(LDSHARED) -o $@ $(LIBRARY_OBJS) $(SHLIBS) $(LIBC) $(LIBM)
 
 # This rule is here for OPENSTEP/Rhapsody/MacOSX. It builds a temporary
@@ -627,6 +629,8 @@ bininstall:	altbininstall
 	else true; \
 	fi
 	(cd $(DESTDIR)$(BINDIR); $(LN) python$(VERSION)$(EXE) $(PYTHON))
+	-rm -f $(DESTDIR)$(LIBPC)/python.pc
+	(cd $(DESTDIR)$(LIBPC); $(LN) -s python-$(VERSION).pc python.pc)
 
 # Install the interpreter with $(VERSION) affixed
 # This goes into $(exec_prefix)
@@ -794,10 +798,14 @@ inclinstall:
 	$(INSTALL_DATA) pyconfig.h $(DESTDIR)$(CONFINCLUDEPY)/pyconfig.h
 
 # Install the library and miscellaneous stuff needed for extending/embedding
-# This goes into $(exec_prefix)
-LIBPL=		$(LIBP)/config
+# This goes into $(exec_prefix)$(DEBUG_EXT)
+LIBPL=		$(LIBP)/config$(DEBUG_EXT)
+
+# pkgconfig directory
+LIBPC=		$(LIBDIR)/pkgconfig
+
 libainstall:	all
-	@for i in $(LIBDIR) $(LIBP) $(LIBPL); \
+	@for i in $(LIBDIR) $(LIBP) $(LIBPL) $(LIBPC); \
 	do \
 		if test ! -d $(DESTDIR)$$i; then \
 			echo "Creating directory $$i"; \
@@ -824,6 +832,7 @@ libainstall:	all
 	$(INSTALL_DATA) Modules/Setup $(DESTDIR)$(LIBPL)/Setup
 	$(INSTALL_DATA) Modules/Setup.local $(DESTDIR)$(LIBPL)/Setup.local
 	$(INSTALL_DATA) Modules/Setup.config $(DESTDIR)$(LIBPL)/Setup.config
+	$(INSTALL_DATA) Misc/python.pc $(DESTDIR)$(LIBPC)/python-$(VERSION).pc
 	$(INSTALL_SCRIPT) $(srcdir)/Modules/makesetup $(DESTDIR)$(LIBPL)/makesetup
 	$(INSTALL_SCRIPT) $(srcdir)/install-sh $(DESTDIR)$(LIBPL)/install-sh
 	@if [ -s Modules/python.exp -a \

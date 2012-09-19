@@ -1,3 +1,19 @@
+python2.4 (2.4.6-4+lucid1) lucid; urgency=low
+
+  * New version number scheme.
+  * Imported packaging from python2.5 package. As a consequence, a number
+    of changes were imported from that package:
+    - Added implementation of PEP 370, "Per user site-packages directory"
+    - Added libpython2.4 package.
+    - Added python2.4-complete package.
+    - Fixed some package names which were still wrong.
+    - Built against newer libdb versions.
+    - Probably other small stuff.
+  * Backported pkg-config support (see Python issue #3585).
+  * Fix static debug library.
+
+ -- Felix Krull <f_krull@gmx.de>  Tue, 18 Sep 2012 22:26:20 +0200
+
 python2.4 (2.4.6-3+precise1) precise; urgency=low
 
   * Imported from Oneiric package.

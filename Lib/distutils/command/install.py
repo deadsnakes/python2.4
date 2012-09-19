@@ -135,6 +135,9 @@ class install (Command):
 
         ('record=', None,
          "filename in which to record list of installed files"),
+
+        ('install-layout=', None,
+         "installation layout to choose (known values: deb)"),
         ]
 
     boolean_options = ['compile', 'force', 'skip-build']
@@ -166,6 +169,9 @@ class install (Command):
         self.install_lib = None         # set to either purelib or platlib
         self.install_scripts = None
         self.install_data = None
+
+        # enable custom installation, known values: deb, IGNORED in 2.5
+        self.install_layout = None
 
         self.compile = None
         self.optimize = None
@@ -601,6 +607,7 @@ class install (Command):
                     ('install_headers', has_headers),
                     ('install_scripts', has_scripts),
                     ('install_data',    has_data),
+                    ('install_egg_info', lambda self:True),
                    ]
 
 # class install
