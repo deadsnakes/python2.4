@@ -1,3 +1,15 @@
+python2.4 (2.4.6-4+quantal1) quantal; urgency=low
+
+  * Imported from Precise package.
+
+ -- Felix Krull <f_krull@gmx.de>  Wed, 19 Sep 2012 23:10:04 +0200
+
+python2.4 (2.4.6-4+precise1) precise; urgency=low
+
+  * Imported from Lucid package.
+
+ -- Felix Krull <f_krull@gmx.de>  Wed, 19 Sep 2012 02:00:40 +0200
+
 python2.4 (2.4.6-4+lucid1) lucid; urgency=low
 
   * New version number scheme.
@@ -13,6 +25,18 @@ python2.4 (2.4.6-4+lucid1) lucid; urgency=low
   * Fix static debug library.
 
  -- Felix Krull <f_krull@gmx.de>  Tue, 18 Sep 2012 22:26:20 +0200
+
+python2.4 (2.4.6-3+precise1) precise; urgency=low
+
+  * Imported from Oneiric package.
+
+ -- Felix Krull <f_krull@gmx.de>  Fri, 18 May 2012 22:49:07 +0200
+
+python2.4 (2.4.6-3+oneiric1) oneiric; urgency=low
+
+  * Imported from Natty package.
+
+ -- Felix Krull <f_krull@gmx.de>  Fri, 18 May 2012 18:29:41 +0200
 
 python2.4 (2.4.6-2~ppa9~natty1) natty; urgency=low
 
