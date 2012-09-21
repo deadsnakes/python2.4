@@ -48,9 +48,6 @@ export NVER=2.5
 export PVER=python2.4
 export PRIORITY=$(shell echo $(VER) | tr -d '.')0
 
-# For setup.py to feast upon.
-export DEB_HOST_MULTIARCH=$(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
-
 PREVVER	:= $(shell awk '/^python/ && NR > 1 {print substr($$2,2,length($$2)-2); exit}' debian/changelog)
 
 # default versions are built from the python-defaults source package

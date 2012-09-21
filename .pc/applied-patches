@@ -43,7 +43,7 @@ signal.set_wakeup_fd-doc.diff
 doc-faq.diff
 gettext-use-ubuntu-langpacks.diff
 apport-support.diff
-deadsnakes-multiarch-library-dirs.diff
+deadsnakes-add-multiarch-paths.diff
 deadsnakes-libdb-search-from-py2.7.3.diff
 deadsnakes-libdb-versions.diff
 deadsnakes-ncursesw-include-dir.diff

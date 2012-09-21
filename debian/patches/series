@@ -45,15 +45,11 @@ fpectl-module.diff
 
 signal.set_wakeup_fd-doc.diff
 doc-faq.diff
-
 # This patch is Ubuntu-specific; remove it if you're targeting something else.
 gettext-use-ubuntu-langpacks.diff
-
 apport-support.diff
 
-# This one is Natty-and-newer-specific
-deadsnakes-multiarch-library-dirs.diff
-
+deadsnakes-add-multiarch-paths.diff
 deadsnakes-libdb-search-from-py2.7.3.diff
 deadsnakes-libdb-versions.diff
 deadsnakes-ncursesw-include-dir.diff
