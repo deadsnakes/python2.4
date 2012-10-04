@@ -2,8 +2,10 @@ python2.4 (2.4.6-5+lucid1) lucid; urgency=low
 
   * Added build dependency on python (quantal seems to need this).
   * Only install apport hook in sitecustomize.py, not in site.py.
+  * Warn when wininst-*.exe files are not found (they are in
+    python2.4-dev).
 
- -- Felix Krull <f_krull@gmx.de>  Mon, 24 Sep 2012 15:41:23 +0200
+ -- Felix Krull <f_krull@gmx.de>  Thu, 04 Oct 2012 21:17:13 +0200
 
 python2.4 (2.4.6-4+quantal1) quantal; urgency=low
 
