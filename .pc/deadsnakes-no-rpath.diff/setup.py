@@ -733,12 +733,16 @@ class PyBuildExt(build_ext):
                 print "bsddb lib dir:", dblib_dir, " inc dir:", db_incdir
             db_incs = [db_incdir]
             dblibs = [dblib]
-            # We don't add runtime_library_dirs because it really shouldn't be
-            # necessary on Debian. Besides, newer lintian versions complain.
+            # We add the runtime_library_dirs argument because the
+            # BerkeleyDB lib we're linking against often isn't in the
+            # system dynamic library search path.  This is usually
+            # correct and most trouble free, but may cause problems in
+            # some unusual system configurations (e.g. the directory
+            # is on an NFS server that goes away).
             exts.append(Extension('_bsddb', ['_bsddb.c'],
                                   depends = ['bsddb.h'],
                                   library_dirs=dblib_dir,
-                                  #runtime_library_dirs=dblib_dir,
+                                  runtime_library_dirs=dblib_dir,
                                   include_dirs=db_incs,
                                   libraries=dblibs))
         else:
@@ -789,7 +793,7 @@ class PyBuildExt(build_ext):
             elif db_incs is not None:
                 exts.append( Extension('dbm', ['dbmmodule.c'],
                                        library_dirs=dblib_dir,
-                                       #runtime_library_dirs=dblib_dir,
+                                       runtime_library_dirs=dblib_dir,
                                        include_dirs=db_incs,
                                        define_macros=[('HAVE_BERKDB_H',None),
                                                       ('DB_DBM_HSEARCH',None)],
