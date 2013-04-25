@@ -1,4 +1,26 @@
-python2.4 (2.4.6-4+oneiric1) oneiric; urgency=low
+python2.4 (2.4.6-5+lucid1) lucid; urgency=low
+
+  * Added build dependency on python (quantal seems to need this).
+  * Only install apport hook in sitecustomize.py, not in site.py.
+  * Warn when wininst-*.exe files are not found (they are in
+    python2.4-dev).
+  * Never add rpath to extension modules.
+
+ -- Felix Krull <f_krull@gmx.de>  Thu, 25 Apr 2013 13:44:21 +0200
+
+python2.4 (2.4.6-4+quantal1) quantal; urgency=low
+
+  * Imported from Precise package.
+
+ -- Felix Krull <f_krull@gmx.de>  Wed, 19 Sep 2012 23:10:04 +0200
+
+python2.4 (2.4.6-4+precise1) precise; urgency=low
+
+  * Imported from Lucid package.
+
+ -- Felix Krull <f_krull@gmx.de>  Wed, 19 Sep 2012 02:00:40 +0200
+ 
+ python2.4 (2.4.6-4+oneiric1) oneiric; urgency=low
 
   * Imported from Lucid package.
 
@@ -19,6 +41,12 @@ python2.4 (2.4.6-4+lucid1) lucid; urgency=low
   * Fix static debug library.
 
  -- Felix Krull <f_krull@gmx.de>  Tue, 18 Sep 2012 22:26:20 +0200
+
+python2.4 (2.4.6-3+precise1) precise; urgency=low
+
+  * Imported from Oneiric package.
+
+ -- Felix Krull <f_krull@gmx.de>  Fri, 18 May 2012 22:49:07 +0200 
 
 python2.4 (2.4.6-3+oneiric1) oneiric; urgency=low
 

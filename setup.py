@@ -13,6 +13,7 @@ from distutils.core import Extension, setup
 from distutils.command.build_ext import build_ext
 from distutils.command.install import install
 from distutils.command.install_lib import install_lib
+from distutils.spawn import find_executable
 
 # This global variable is used to hold the list of modules to be disabled.
 disabled_module_list = []
@@ -238,11 +239,38 @@ class PyBuildExt(build_ext):
                 return platform
         return sys.platform
 
+    def add_multiarch_paths(self):
+        # Debian/Ubuntu multiarch support.
+        # https://wiki.ubuntu.com/MultiarchSpec
+        if not find_executable('dpkg-architecture'):
+            return
+        tmpfile = os.path.join(self.build_temp, 'multiarch')
+        if not os.path.exists(self.build_temp):
+            os.makedirs(self.build_temp)
+        ret = os.system(
+            'dpkg-architecture -qDEB_HOST_MULTIARCH > %s 2> /dev/null' %
+            tmpfile)
+        try:
+            if ret >> 8 == 0:
+                fp = open(tmpfile)
+                try:
+                    multiarch_path_component = fp.readline().strip()
+                finally:
+                    fp.close()
+
+                add_dir_to_list(self.compiler.library_dirs,
+                                '/usr/lib/' + multiarch_path_component)
+                add_dir_to_list(self.compiler.include_dirs,
+                                '/usr/include/' + multiarch_path_component)
+        finally:
+            os.unlink(tmpfile)
+
     def detect_modules(self):
         # Ensure that /usr/local is always used
         # On Debian /usr/local is always used, so we don't include it twice
         #add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
         #add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
+        self.add_multiarch_paths()
 
         # Add paths to popular package managers on OS X/darwin
         if sys.platform == "darwin":
@@ -270,8 +298,6 @@ class PyBuildExt(build_ext):
         lib_dirs = self.compiler.library_dirs + [
             '/lib64', '/usr/lib64',
             '/lib', '/usr/lib',
-            '/lib/%s' % os.getenv('DEB_HOST_MULTIARCH'),
-            '/usr/lib/%s' % os.getenv('DEB_HOST_MULTIARCH')
             ]
         inc_dirs = self.compiler.include_dirs + ['/usr/include']
         gnu_triplet = os.popen('dpkg-architecture -qDEB_HOST_GNU_TYPE').readline()[:-1]; print 'XXX', gnu_triplet
@@ -707,16 +733,12 @@ class PyBuildExt(build_ext):
                 print "bsddb lib dir:", dblib_dir, " inc dir:", db_incdir
             db_incs = [db_incdir]
             dblibs = [dblib]
-            # We add the runtime_library_dirs argument because the
-            # BerkeleyDB lib we're linking against often isn't in the
-            # system dynamic library search path.  This is usually
-            # correct and most trouble free, but may cause problems in
-            # some unusual system configurations (e.g. the directory
-            # is on an NFS server that goes away).
+            # We don't add runtime_library_dirs because it really shouldn't be
+            # necessary on Debian. Besides, newer lintian versions complain.
             exts.append(Extension('_bsddb', ['_bsddb.c'],
                                   depends = ['bsddb.h'],
                                   library_dirs=dblib_dir,
-                                  runtime_library_dirs=dblib_dir,
+                                  #runtime_library_dirs=dblib_dir,
                                   include_dirs=db_incs,
                                   libraries=dblibs))
         else:
@@ -767,7 +789,7 @@ class PyBuildExt(build_ext):
             elif db_incs is not None:
                 exts.append( Extension('dbm', ['dbmmodule.c'],
                                        library_dirs=dblib_dir,
-                                       runtime_library_dirs=dblib_dir,
+                                       #runtime_library_dirs=dblib_dir,
                                        include_dirs=db_incs,
                                        define_macros=[('HAVE_BERKDB_H',None),
                                                       ('DB_DBM_HSEARCH',None)],

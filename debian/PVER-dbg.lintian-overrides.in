@@ -1,0 +1,5 @@
+@PVER@-dbg binary: embedded-library usr/lib/@PVER@/lib-dynload/pyexpat_d.so: expat
+@PVER@-dbg binary: binary-without-manpage usr/bin/@PVER@-dbg-config
+@PVER@-dbg binary: non-dev-pkg-with-shlib-symlink
+@PVER@-dbg binary: package-name-doesnt-match-sonames
+@PVER@-dbg binary: hardening-no-fortify-functions *

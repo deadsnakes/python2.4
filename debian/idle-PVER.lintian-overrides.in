@@ -1,0 +1,5 @@
+idle-@PVER@ binary: image-file-in-usr-lib
+
+# it's in @PVER@
+idle-@PVER@: menu-icon-missing
+

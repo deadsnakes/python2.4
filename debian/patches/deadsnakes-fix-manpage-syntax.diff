@@ -1,0 +1,12 @@
+--- a/Misc/python.man
++++ b/Misc/python.man
+@@ -1,7 +1,7 @@
+ .TH PYTHON "1" "$Date: 2005-03-20 15:18:04 +0100 (Sun, 20 Mar 2005) $"
+ 
+-./" To view this file while editing, run it through groff:
+-./"   groff -Tascii -man python.man | less
++.\" To view this file while editing, run it through groff:
++.\"   groff -Tascii -man python.man | less
+ 
+ .SH NAME
+ python \- an interpreted, interactive, object-oriented programming language

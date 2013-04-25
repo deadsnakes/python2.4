@@ -7,7 +7,7 @@
 
 --- a/setup.py
 +++ b/setup.py
-@@ -798,13 +798,15 @@
+@@ -824,13 +824,15 @@
          # Curses support, requiring the System V version of curses, often
          # provided by the ncurses library.
          panel_library = 'panel'
@@ -24,7 +24,7 @@
          elif (self.compiler.find_library_file(lib_dirs, 'ncurses')):
              curses_libs = ['ncurses']
              exts.append( Extension('_curses', ['_cursesmodule.c'],
-@@ -827,7 +829,8 @@
+@@ -853,7 +855,8 @@
          if (module_enabled(exts, '_curses') and
              self.compiler.find_library_file(lib_dirs, panel_library)):
              exts.append( Extension('_curses_panel', ['_curses_panel.c'],
