@@ -2,3 +2,4 @@
 @PVER@-dbg binary: binary-without-manpage usr/bin/@PVER@-dbg-config
 @PVER@-dbg binary: non-dev-pkg-with-shlib-symlink
 @PVER@-dbg binary: package-name-doesnt-match-sonames
+@PVER@-dbg binary: hardening-no-fortify-functions *
