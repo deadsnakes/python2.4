@@ -6,3 +6,5 @@
 
 @PVER@ binary: desktop-command-not-in-package
 @PVER@ binary: menu-command-not-in-package
+
+@PVER@ binary: hardening-no-fortify-functions *
