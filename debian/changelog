@@ -26,7 +26,7 @@ python2.4 (2.4.6-4+precise1) precise; urgency=low
 
  -- Felix Krull <f_krull@gmx.de>  Wed, 19 Sep 2012 02:00:40 +0200
  
- python2.4 (2.4.6-4+oneiric1) oneiric; urgency=low
+python2.4 (2.4.6-4+oneiric1) oneiric; urgency=low
 
   * Imported from Lucid package.
 
