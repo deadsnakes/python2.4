@@ -10,9 +10,9 @@ update-alternatives --remove python /usr/bin/python@VER@ || true
 if [ "$1" = configure ]; then
     (
     files=$(dpkg -L @PVER@ | sed -n '/^\/usr\/lib\/@PVER@\/.*\.py$/p')
-	/usr/bin/@PVER@ /usr/lib/@PVER@/py_compile.py $files
+	@PVER@ /usr/lib/@PVER@/py_compile.py $files
 	if grep -sq '^byte-compile[^#]*optimize' /etc/python/debian_config; then
-	    /usr/bin/@PVER@ -O /usr/lib/@PVER@/py_compile.py $files
+	    @PVER@ -O /usr/lib/@PVER@/py_compile.py $files
 	fi
     )
 fi
@@ -38,8 +38,6 @@ case "$1" in
         exit 1
     ;;
 esac
-
-ldconfig
 
 #DEBHELPER#
 

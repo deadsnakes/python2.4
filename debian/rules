@@ -9,6 +9,9 @@ export SHELL = /bin/bash
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+# Preserve these generated files when cleaning so they're included in the source package
+PRESERVE_FILES := "debian/control:debian/source.lintian-overrides"
+
 DEB_BUILD_OPTIONS := "nocheck nobench"
 
 DEB_HOST_ARCH		?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
@@ -47,9 +50,6 @@ export VER=2.4
 export NVER=2.5
 export PVER=python2.4
 export PRIORITY=$(shell echo $(VER) | tr -d '.')0
-
-# For setup.py to feast upon.
-export DEB_HOST_MULTIARCH=$(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
 PREVVER	:= $(shell awk '/^python/ && NR > 1 {print substr($$2,2,length($$2)-2); exit}' debian/changelog)
 
@@ -529,9 +529,28 @@ endif
 	  && rm -f debian/control.tmp && exit 0; \
 	  mv debian/control.tmp debian/control
 
+generated-files: control-file
+	: # We have to prepare the various control files
 
+	for f in debian/*.in; do \
+	  f2=`echo $$f | sed "s,PVER,$(PVER),g;s/@VER@/$(VER)/g;s,\.in$$,,"`; \
+	  if [ $$f2 != debian/control ]; then \
+	    sed -e "s/@PVER@/$(PVER)/g;s/@VER@/$(VER)/g" \
+		    -e "s/@PRIORITY@/$(PRIORITY)/g" \
+		    -e "s,@SCRIPTDIR@,/$(scriptdir),g" \
+		    -e "s,@INFO@,$(info_docs),g" \
+		  <$$f >$$f2; \
+	  fi; \
+	done
+#ifeq ($(DEB_HOST_ARCH_BITS),64)
+#	sed -i 's/\(Py_InitModule4[^@]*\)@/\1_64@/' \
+#		debian/lib$(PVER).symbols debian/$(PVER)-dbg.symbols
+#endif
 
-clean: control-file
+stamps/stamp-control: generated-files
+	touch stamps/stamp-control
+
+clean: generated-files
 	dh_testdir
 	dh_testroot
 	rm -rf stamps
@@ -551,35 +570,17 @@ clean: control-file
 
 	for f in debian/*.in; do \
 	  f2=`echo $$f | sed "s,PVER,$(PVER),g;s/@VER@/$(VER)/g;s,\.in$$,,"`; \
-	  if [ $$f2 != debian/control ]; then \
+	  if [[ "$(PRESERVE_FILES)" != *"$$f2"* ]]; then \
 	    rm -f $$f2; \
 	  fi; \
 	done
 	dh_clean
 
-stamps/stamp-control:
-	: # We have to prepare the various control files
-
-	for f in debian/*.in; do \
-	  f2=`echo $$f | sed "s,PVER,$(PVER),g;s/@VER@/$(VER)/g;s,\.in$$,,"`; \
-	  if [ $$f2 != debian/control ]; then \
-	    sed -e "s/@PVER@/$(PVER)/g;s/@VER@/$(VER)/g" \
-		    -e "s/@PRIORITY@/$(PRIORITY)/g" \
-		    -e "s,@SCRIPTDIR@,/$(scriptdir),g" \
-		    -e "s,@INFO@,$(info_docs),g" \
-		  <$$f >$$f2; \
-	  fi; \
-	done
-#ifeq ($(DEB_HOST_ARCH_BITS),64)
-#	sed -i 's/\(Py_InitModule4[^@]*\)@/\1_64@/' \
-#		debian/lib$(PVER).symbols debian/$(PVER)-dbg.symbols
-#endif
-
 install: $(build_target) stamps/stamp-install
 stamps/stamp-install: stamps/stamp-build control-file stamps/stamp-control
 	dh_testdir
 	dh_testroot
-	dh_clean -k
+	dh_prep
 	dh_installdirs
 
 	: # make install into tmp and subsequently move the files into
@@ -696,7 +697,6 @@ endif
 		usr/include \
 		usr/lib
 	cp -p Misc/HISTORY Misc/README.valgrind Misc/gdbinit \
-		debian/README.maintainers \
 		debian/test_results $(buildd_static)/pybench.log \
 	    $(d_dev)/usr/share/doc/python$(VER)/
 
@@ -808,13 +808,8 @@ endif
 		$(d_idle)/usr/share/applications/idle-$(PVER).desktop
 
 	: # those packages have own README.Debian's
-	install -m 644 -p debian/README.$(p_base) \
-		$(d_base)/usr/share/doc/$(PVER)/README.Debian
 	install -m 644 -p debian/README.$(p_idle) \
 		$(d_idle)/usr/share/doc/$(p_idle)/README.Debian
-ifeq ($(with_tk),yes)
-	cp -p debian/README.Tk $(d_tk)/usr/share/doc/$(p_tk)/
-endif
 
 	: # The rest goes into $(p_base)
 	mkdir -p $(d)/usr/lib/python$(VER)/site-packages
@@ -906,11 +901,6 @@ endif
 	cp -p $(buildd_debug)/pyconfig.h $(d_dbg)/usr/include/$(PVER)_d/
 	ln -sf $(PVER).1.gz $(d_dbg)/usr/share/man/man1/$(PVER)-dbg.1.gz
 
-	#for i in debian/*.overrides; do \
-	#  b=$$(basename $$i .overrides); \
-	#  install -D -m 644 $$i debian/$$b/usr/share/lintian/overrides/$$b; \
-	#done
-
 	touch stamps/stamp-install
 
 # Build architecture-independent files here.
@@ -967,6 +957,7 @@ endif
 	done
 	-find $(d_doc) -name '*.txt' -perm 755 -exec chmod 644 {} \;
 
+	dh_lintian -i $(dh_args)
 	dh_installdeb -i $(dh_args)
 	dh_gencontrol -i $(dh_args)
 	dh_md5sums -i $(dh_args)
@@ -1017,6 +1008,7 @@ endif
 # which either can be built as builtin or extension.
 	sed -ri '/^ (_check_|asdl_|fast_save_|init)/d' \
 	  $(d_lib)/DEBIAN/symbols $(d_dbg)/DEBIAN/symbols
+	dh_lintian -a
 	dh_installdeb -a
 	dh_shlibdeps -a
 	dh_gencontrol -a

@@ -318,8 +318,5 @@ class bdist_wininst (Command):
         # we must use a wininst-x.y.exe built with the same C compiler
         # used for python.  XXX What about mingw, borland, and so on?
         filename = os.path.join(directory, "wininst-%s.exe" % bv)
-        try:
-            return open(filename, "rb").read()
-        except IOError, msg:
-            raise DistutilsFileError, str(msg) + ', please install the python%s-dev package' % sys.version[:3]
+        return open(filename, "rb").read()
 # class bdist_wininst

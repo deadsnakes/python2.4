@@ -1,6 +1,6 @@
 --- a/setup.py
 +++ b/setup.py
-@@ -527,8 +527,8 @@
+@@ -553,8 +553,8 @@
          #
          # http://www.sleepycat.com/update/index.html
  
