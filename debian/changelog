@@ -1,3 +1,9 @@
+python2.4 (2.4.6-5+raring1) raring; urgency=low
+
+  * Imported from Quantal package.
+
+ -- Felix Krull <f_krull@gmx.de>  Thu, 25 Apr 2013 20:35:05 +0200
+
 python2.4 (2.4.6-5+quantal1) quantal; urgency=low
 
   * Imported from Lucid package.
