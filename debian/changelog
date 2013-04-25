@@ -1,3 +1,9 @@
+python2.4 (2.4.6-5+oneiric1) oneiric; urgency=low
+
+  * Imported from Lucid package.
+
+ -- Felix Krull <f_krull@gmx.de>  Thu, 25 Apr 2013 14:56:07 +0200
+
 python2.4 (2.4.6-5+lucid1) lucid; urgency=low
 
   * Added build dependency on python (quantal seems to need this).
