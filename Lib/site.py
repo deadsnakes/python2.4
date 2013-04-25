@@ -399,14 +399,6 @@ def main():
     # this module is run as a script, because this code is executed twice.
     if hasattr(sys, "setdefaultencoding"):
         del sys.setdefaultencoding
-    # install the apport exception handler if available
-    try:
-        import apport_python_hook
-    except ImportError:
-        pass
-    else:
-        apport_python_hook.install()
-
 
 main()
 

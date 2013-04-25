@@ -13,8 +13,8 @@ case "$1" in
 	    | awk '/\.py$/ {print $0"c\n" $0"o"}' \
 	    | xargs rm -f >&2
 
-	if [ -x /usr/sbin/update-binfmts ]; then
-	    /usr/sbin/update-binfmts --package @PVER@ \
+	if which update-binfmts > /dev/null; then
+	    update-binfmts --package @PVER@ \
 		--remove @PVER@ /usr/bin/@PVER@
 	fi
 

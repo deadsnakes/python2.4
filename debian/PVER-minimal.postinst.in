@@ -11,9 +11,9 @@ fi
 if [ "$1" = configure ]; then
     (
     files=$(dpkg -L @PVER@-minimal | sed -n '/^\/usr\/lib\/@PVER@\/.*\.py$/p')
-	/usr/bin/@PVER@ /usr/lib/@PVER@/py_compile.py $files
+	@PVER@ /usr/lib/@PVER@/py_compile.py $files
 	if grep -sq '^byte-compile[^#]*optimize' /etc/python/debian_config; then
-	    /usr/bin/@PVER@ -O /usr/lib/@PVER@/py_compile.py $files
+	    @PVER@ -O /usr/lib/@PVER@/py_compile.py $files
 	fi
     )
     bc=no
@@ -57,8 +57,8 @@ case "$1" in
             chown root:staff /usr/local/lib/@PVER@/site-packages 2> /dev/null || true
         fi
 
-	if [ -x /usr/sbin/update-binfmts ]; then
-	    /usr/sbin/update-binfmts --import @PVER@
+    if which update-binfmts > /dev/null; then
+	    update-binfmts --import @PVER@
 	fi
 
     ;;

@@ -1,6 +1,6 @@
 --- a/setup.py
 +++ b/setup.py
-@@ -531,28 +531,60 @@
+@@ -557,28 +557,60 @@
          min_db_ver = (3, 2)
          db_setup_debug = False   # verbose debug prints from this script?
  
@@ -64,7 +64,7 @@
              db_inc_paths.append('/usr/include/db3%d' % x)
              db_inc_paths.append('/usr/local/BerkeleyDB.3.%d/include' % x)
              db_inc_paths.append('/usr/local/include/db3%d' % x)
-@@ -567,23 +599,31 @@
+@@ -593,23 +625,31 @@
          for dn in inc_dirs:
              std_variants.append(os.path.join(dn, 'db3'))
              std_variants.append(os.path.join(dn, 'db4'))
@@ -98,7 +98,7 @@
                  if db_setup_debug: print "db: looking for db.h in", f
                  if os.path.exists(f):
                      f = open(f).read()
-@@ -594,18 +634,29 @@
+@@ -620,18 +660,29 @@
                          db_minor = int(m.group(1))
                          db_ver = (db_major, db_minor)
  
@@ -133,7 +133,7 @@
  
              db_found_vers = db_ver_inc_map.keys()
              db_found_vers.sort()
-@@ -616,14 +667,26 @@
+@@ -642,14 +693,26 @@
  
                  # check lib directories parallel to the location of the header
                  db_dirs_to_check = [
@@ -166,7 +166,7 @@
                  # XXX should we -ever- look for a dbX name?  Do any
                  # systems really not name their library by version and
                  # symlink to more general names?
-@@ -639,8 +702,9 @@
+@@ -665,8 +728,9 @@
                          if db_setup_debug: print "db lib: ", dblib, "not found"
  
          except db_found:
@@ -178,7 +178,7 @@
              db_incs = [db_incdir]
              dblibs = [dblib]
              # We add the runtime_library_dirs argument because the
-@@ -650,6 +714,7 @@
+@@ -676,6 +740,7 @@
              # some unusual system configurations (e.g. the directory
              # is on an NFS server that goes away).
              exts.append(Extension('_bsddb', ['_bsddb.c'],
