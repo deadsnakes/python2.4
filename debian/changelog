@@ -1,3 +1,9 @@
+python2.4 (2.4.6-6+precise1) UNRELEASED; urgency=low
+
+  * Enable binary hardening compile-time options.
+
+ -- Felix Krull <f_krull@gmx.de>  Fri, 26 Apr 2013 14:39:08 +0200
+
 python2.4 (2.4.6-5+precise1) precise; urgency=low
 
   * Imported from Lucid package.
