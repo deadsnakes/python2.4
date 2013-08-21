@@ -1,3 +1,8 @@
+python2.4 (2.4.6-7+precise1) UNRELEASED; urgency=low
+
+
+ -- Felix Krull <f_krull@gmx.de>  Wed, 21 Aug 2013 14:47:23 +0200
+
 python2.4 (2.4.6-6+precise1) precise; urgency=low
 
   * Enable binary hardening compile-time options.
