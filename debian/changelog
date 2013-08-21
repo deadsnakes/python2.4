@@ -1,3 +1,11 @@
+python2.4 (2.4.6-6+precise1) precise; urgency=low
+
+  * Enable binary hardening compile-time options.
+  * Backport bsddb module from Python 2.7.5 (the original module doesn't
+    actually work with the more recent libdb versions in precise and up).
+
+ -- Felix Krull <f_krull@gmx.de>  Fri, 26 Apr 2013 14:39:08 +0200
+
 python2.4 (2.4.6-5+raring1) raring; urgency=low
 
   * Imported from Quantal package.
@@ -9,6 +17,12 @@ python2.4 (2.4.6-5+quantal1) quantal; urgency=low
   * Imported from Lucid package.
 
  -- Felix Krull <f_krull@gmx.de>  Thu, 25 Apr 2013 13:45:18 +0200
+
+python2.4 (2.4.6-5+precise1) precise; urgency=low
+
+  * Imported from Lucid package.
+
+ -- Felix Krull <f_krull@gmx.de>  Thu, 25 Apr 2013 18:33:12 +0200
 
 python2.4 (2.4.6-5+lucid1) lucid; urgency=low
 

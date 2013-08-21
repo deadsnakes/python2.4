@@ -9,6 +9,9 @@ export SHELL = /bin/bash
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+
 # Preserve these generated files when cleaning so they're included in the source package
 PRESERVE_FILES := "debian/control:debian/source.lintian-overrides"
 
