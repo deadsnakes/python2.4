@@ -1,6 +1,8 @@
 python2.4 (2.4.6-6+precise1) UNRELEASED; urgency=low
 
   * Enable binary hardening compile-time options.
+  * Backport bsddb module from Python 2.7.5 (the original module doesn't
+    actually work with the more recent libdb versions in precise and up).
 
  -- Felix Krull <f_krull@gmx.de>  Fri, 26 Apr 2013 14:39:08 +0200
 

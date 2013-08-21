@@ -58,3 +58,4 @@ deadsnakes-backport-pkg-config-support.diff
 bdist-wininst-notfound.diff
 deadsnakes-fix-manpage-syntax.diff
 deadsnakes-no-rpath.diff
+deadsnakes-bsddb-from-py2.7.5.diff
