@@ -64,9 +64,5 @@ sed -i 's/^@top \(.*\)/@top \1 (v2.5)\n@dircategory Python\n@direntry\n* '$DOCID
 
 # generate the .info files:
 
-# We use force here to get texinfo to just run without caring about errors. I
-# think parts of the info documentation have been broken for some time now;
-# there's a syntax error somewhere in the generated PVER-ref.texi. Let's just
-# hope noone uses info anymore and move on.
-run $MAKEINFO --force --footnote-style end --fill-column 72 \
+run $MAKEINFO --footnote-style end --fill-column 72 \
 	      --paragraph-indent 0 --output=$INFONAME $TEXINAME
