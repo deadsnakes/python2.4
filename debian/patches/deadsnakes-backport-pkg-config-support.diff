@@ -62,7 +62,7 @@
 +Cflags: -I${includedir}/python@VERSION@
 --- a/configure.in
 +++ b/configure.in
-@@ -3280,7 +3280,7 @@
+@@ -3284,7 +3284,7 @@
  AC_MSG_RESULT(done)
  
  # generate output files
