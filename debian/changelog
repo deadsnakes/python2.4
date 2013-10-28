@@ -1,3 +1,10 @@
+python2.4 (2.4.6-7+precise1) precise; urgency=low
+
+  * Fix ncurses header detection. #6
+    - See also LP #1021783
+
+ -- Felix Krull <f_krull@gmx.de>  Mon, 28 Oct 2013 14:52:23 +0100
+
 python2.4 (2.4.6-6+precise1) precise; urgency=low
 
   * Enable binary hardening compile-time options.
