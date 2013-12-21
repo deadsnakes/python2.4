@@ -69,7 +69,14 @@ the various releases.
     2.3.2           2.3.1       2002-2003   PSF         yes
     2.3.3           2.3.2       2002-2003   PSF         yes
     2.3.4           2.3.3       2004        PSF         yes
+    2.3.5           2.3.4       2005        PSF         yes
     2.4             2.3         2004        PSF         yes
+    2.4.1           2.4.1       2005        PSF         yes
+    2.4.2           2.4.1       2005        PSF         yes
+    2.4.3           2.4.2       2006        PSF         yes
+    2.4.4           2.4.3       2006        PSF         yes
+    2.4.5           2.4.4       2008        PSF         yes
+    2.5             2.4         2006        PSF         yes
 
 Footnotes:
 
@@ -102,12 +109,12 @@ its associated documentation.
 2. Subject to the terms and conditions of this License Agreement, PSF
 hereby grants Licensee a nonexclusive, royalty-free, world-wide
 license to reproduce, analyze, test, perform and/or display publicly,
-prepare derivative works, distribute, and otherwise use Python
-alone or in any derivative version, provided, however, that PSF's
-License Agreement and PSF's notice of copyright, i.e., "Copyright (c)
-2001, 2002, 2003, 2004 Python Software Foundation; All Rights Reserved"
-are retained in Python alone or in any derivative version prepared
-by Licensee.
+prepare derivative works, distribute, and otherwise use Python alone
+or in any derivative version, provided, however, that PSF's License
+Agreement and PSF's notice of copyright, i.e., "Copyright (c) 2001,
+2002, 2003, 2004, 2005, 2006, 2007, 2008 Python Software Foundation;
+All Rights Reserved" are retained in Python alone or in any derivative
+version prepared by Licensee.
 
 3. In the event Licensee prepares a derivative work that is based on
 or incorporates Python or any part thereof, and wants to make
@@ -284,6 +291,7 @@ FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
 WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
 OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
 
 
 
@@ -544,27 +552,21 @@ Profiling
 
 The `profile` and `pstats` modules contain the following notice:
 
-      Copyright 1994, by InfoSeek Corporation, all rights reserved.
       Written by James Roskind
+      Based on prior profile module by Sjoerd Mullender...
+       which was hacked somewhat by: Guido van Rossum
 
-      Permission to use, copy, modify, and distribute this Python software
-      and its associated documentation for any purpose (subject to the
-      restriction in the following sentence) without fee is hereby granted,
-      provided that the above copyright notice appears in all copies, and
-      that both that copyright notice and this permission notice appear in
-      supporting documentation, and that the name of InfoSeek not be used in
-      advertising or publicity pertaining to distribution of the software
-      without specific, written prior permission.  This permission is
-      explicitly restricted to the copying and modification of the software
-      to remain in Python, compiled Python, or other languages (such as C)
-      wherein the modified or derived code is exclusively imported into a
-      Python module.
+      Copyright Disney Enterprises, Inc.  All Rights Reserved.
+      Licensed to PSF under a Contributor Agreement
 
-      INFOSEEK CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-      SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
-      FITNESS. IN NO EVENT SHALL INFOSEEK CORPORATION BE LIABLE FOR ANY
-      SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
-      RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
-      CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
-      CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      You may obtain a copy of the License at
 
+      http://www.apache.org/licenses/LICENSE-2.0
+
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+      either express or implied.  See the License for the specific language
+      governing permissions and limitations under the License.
