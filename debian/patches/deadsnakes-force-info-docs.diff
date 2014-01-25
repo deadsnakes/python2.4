@@ -1,0 +1,13 @@
+--- a/Doc/tools/mkinfo
++++ b/Doc/tools/mkinfo
+@@ -64,5 +64,9 @@
+ 
+ # generate the .info files:
+ 
+-run $MAKEINFO --footnote-style end --fill-column 72 \
++# We use force here to get texinfo to just run without caring about errors. I
++# think parts of the info documentation have been broken for some time now;
++# there's a syntax error somewhere in the generated PVER-ref.texi. Let's just
++# hope noone uses info anymore and move on.
++run $MAKEINFO --force --footnote-style end --fill-column 72 \
+ 	      --paragraph-indent 0 --output=$INFONAME $TEXINAME
