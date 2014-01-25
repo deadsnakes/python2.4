@@ -1,3 +1,10 @@
+python2.4 (2.4.6-8+precise1) precise; urgency=low
+
+  * Fix doc build for saucy and trusty.
+  * Have `sys.platform` be "linux" even on Linux 3.*.
+
+ -- Felix Krull <f_krull@gmx.de>  Fri, 24 Jan 2014 20:36:52 +0100
+
 python2.4 (2.4.6-7+precise1) precise; urgency=low
 
   * Fix ncurses header detection. #6
