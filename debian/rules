@@ -499,6 +499,7 @@ minimal-test:
 stamps/stamp-doc-html:
 	dh_testdir
 	LD_LIBRARY_PATH=$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(buildd_static) \
+	PERL5LIB=$(CURDIR)/Doc/perl \
 	    $(MAKE) -C Doc tarhtml \
 		PYTHON=$(python_for_doc) \
 		MKHOWTO='TEXINPUTS=$$(TEXINPUTS) $$(PYTHON) $$(CURDIR)/tools/mkhowto'
