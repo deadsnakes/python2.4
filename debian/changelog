@@ -1,3 +1,9 @@
+python2.4 (2.4.6-8+utopic1) utopic; urgency=medium
+
+  * Imported from Precise package.
+
+ -- Felix Krull <f_krull@gmx.de>  Fri, 10 Oct 2014 21:14:04 +0000
+
 python2.4 (2.4.6-8+precise1) precise; urgency=low
 
   * Fix doc build for saucy and trusty.
