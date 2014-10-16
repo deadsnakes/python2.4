@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+
+MODS="_ssl readline curses gdbm Tkinter test.test_support bsddb"
+for mod in $MODS; do
+  @PVER@ -c "import $mod"
+done

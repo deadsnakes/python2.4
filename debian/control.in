@@ -19,6 +19,7 @@ Vcs-Browser: https://bitbucket.org/fk/deadsnakes-@PVER@
 Vcs-Hg: https://bitbucket.org/fk/deadsnakes-@PVER@
 X-Original-Vcs-Browser: https://code.launchpad.net/~doko/python/pkg@VER@
 X-Original-Vcs-Bzr: http://bazaar.launchpad.net/~doko/python/pkg@VER@
+XS-Testsuite: autopkgtest
 
 Package: @PVER@
 Architecture: any

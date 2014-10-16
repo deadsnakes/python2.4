@@ -19,6 +19,7 @@ Vcs-Browser: https://bitbucket.org/fk/deadsnakes-python2.4
 Vcs-Hg: https://bitbucket.org/fk/deadsnakes-python2.4
 X-Original-Vcs-Browser: https://code.launchpad.net/~doko/python/pkg2.4
 X-Original-Vcs-Bzr: http://bazaar.launchpad.net/~doko/python/pkg2.4
+XS-Testsuite: autopkgtest
 
 Package: python2.4
 Architecture: any
