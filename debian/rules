@@ -683,7 +683,12 @@ endif
 		$(scriptdir)/config/Makefile \
 		usr/include/$(PVER)/pyconfig.h \
 		$(scriptdir)/site.py \
-		$(scriptdir)/site-packages/pep-370-per-user-site-packages.pth
+		$(scriptdir)/site-packages/pep-370-per-user-site-packages.pth \
+		`cd $(d); for i in $(MIN_EXTS); do \
+			test -e $(scriptdir)/lib-dynload/$$i*.so \
+			  && echo $(scriptdir)/lib-dynload/$$i*.so; \
+		  done`
+	#ls -l  $(d_min)/$(scriptdir)/lib-dynload/*.so
 
 #		$(foreach i,$(MIN_EXTS),$(scriptdir)/lib-dynload/$(i).so) \
 
