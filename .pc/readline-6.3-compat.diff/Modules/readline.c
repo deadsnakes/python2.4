@@ -714,27 +714,12 @@ setup_readline(void)
 	rl_bind_key_in_map ('\t', rl_complete, emacs_meta_keymap);
 	rl_bind_key_in_map ('\033', rl_complete, emacs_meta_keymap);
 	/* Set our hook functions */
-	rl_startup_hook =
-#if defined(_RL_FUNCTION_TYPEDEF)
-		(rl_hook_func_t *)on_startup_hook;
-#else
-		(Function *)on_startup_hook;
-#endif
+	rl_startup_hook = (Function *)on_startup_hook;
 #ifdef HAVE_RL_PRE_INPUT_HOOK
-	rl_pre_input_hook =
-#if defined(_RL_FUNCTION_TYPEDEF)
-		(rl_hook_func_t *)on_pre_input_hook;
-#else
-		(Function *)on_pre_input_hook;
-#endif
+	rl_pre_input_hook = (Function *)on_pre_input_hook;
 #endif
 	/* Set our completion function */
-	rl_attempted_completion_function =
-#if defined(_RL_FUNCTION_TYPEDEF)
-		(rl_completion_func_t *)flex_complete;
-#else
-		(CPPFunction *)flex_complete;
-#endif
+	rl_attempted_completion_function = (CPPFunction *)flex_complete;
 	/* Set Python word break characters */
 	rl_completer_word_break_characters =
 		strdup(" \t\n`~!@#$%^&*()-=+[{]}\\|;:'\",<>/?");
