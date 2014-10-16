@@ -63,7 +63,7 @@ STATIC_PYTHON=yes
 
 MIN_MODS := $(shell awk '/^  / && $$2 == "module" { print $$1 }' \
 		debian/PVER-minimal.README.Debian.in)
-MIN_EXTS := $(shell awk '/^  / && $$2 == "extension" { print $$1 }' \
+MIN_EXTS := $(shell awk '/^  / && $$2 ~ /^extension/ { print $$1 }' \
 		debian/PVER-minimal.README.Debian.in)
 MIN_BUILTINS := $(shell awk '/^  / && $$2 == "builtin" { print $$1 }' \
 		debian/PVER-minimal.README.Debian.in)
@@ -476,9 +476,8 @@ minimal-test:
 		mintest/lib/
 	cp -a $(foreach i,$(MIN_PACKAGES),Lib/$(i)) \
 		mintest/lib/
-	: # Don't install minimal extensions since those have been built statically.
-#	cp -p $(foreach i,$(MIN_EXTS),$(buildd_static)/build/lib*/$(i).so) \
-#		mintest/dynlib/
+	cp -p $(wildcard $(foreach i,$(MIN_EXTS),$(buildd_static)/build/lib*/$(i).*.so)) \
+		mintest/dynlib/
 	cp -p Lib/unittest.py mintest/lib/
 	cp -pr Lib/test mintest/lib/
 	cp -pr Lib mintest/all-lib
