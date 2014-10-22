@@ -6,3 +6,6 @@ Depends: @PVER@, @PVER@-gdbm, @PVER@-tk
 
 Tests: check-ndbm
 Depends: libc-bin, @PVER@
+
+Tests: check-minimal-extensions
+Depends: @PVER@-minimal
