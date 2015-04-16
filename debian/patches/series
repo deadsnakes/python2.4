@@ -14,7 +14,7 @@ linux2-platforms.diff
 distutils-install-layout.diff
 readline6.diff
 makesetup-bashism.diff
-emacs23-build.diff
+emacs-version.diff
 tk8.5-compat.diff
 issue8140.diff
 texi-direntries.diff

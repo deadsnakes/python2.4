@@ -34,10 +34,10 @@ $(WHATSNEW):	python$(VERSION)-$(WHATSNEW).info
 
 check-emacs-version:
 	@v="`$(EMACS) --version 2>&1 | egrep '^(GNU |X)Emacs [12]*'`"; \
-	if `echo "$$v" | grep '^GNU Emacs 2[123]' >/dev/null 2>&1`; then \
+	if `echo "$$v" | grep '^GNU Emacs 2[1234]' >/dev/null 2>&1`; then \
 	  echo "Using $(EMACS) to build the info docs"; \
 	else \
-	  echo "GNU Emacs 21, 22, or 23 is required to build the info docs"; \
+	  echo "GNU Emacs 21, 22, 23 or 24 is required to build the info docs"; \
 	  echo "Found $$v"; \
 	  false; \
 	fi
