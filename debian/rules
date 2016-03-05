@@ -674,7 +674,7 @@ endif
 		$(scriptdir)/lib-dynload \
 		$(scriptdir)/config \
 		$(scriptdir)/site-packages
-	DH_COMPAT=2 dh_movefiles -p$(p_min) --sourcedir=$(d) \
+	dh_movefiles -p$(p_min) --sourcedir=$(d) \
 		usr/bin/python$(VER) \
 		usr/share/man/man1/python$(VER).1 \
 		$(foreach i,$(MIN_MODS),$(scriptdir)/$(i).py) \
@@ -711,7 +711,7 @@ endif
 		debian/test_results $(buildd_static)/pybench.log \
 	    $(d_dev)/usr/share/doc/python$(VER)/
 
-	DH_COMPAT=2 dh_movefiles -p$(p_dev) --sourcedir=$(d) \
+	dh_movefiles -p$(p_dev) --sourcedir=$(d) \
 		usr/lib/python$(VER)/config \
 		usr/include/python$(VER) \
 		usr/lib/libpython$(VER).so \
@@ -734,7 +734,7 @@ ifeq ($(with_tk),yes)
 	dh_installdirs -p$(p_tk) \
 		$(scriptdir) \
 		usr/lib/python$(VER)/lib-dynload
-	DH_COMPAT=2 dh_movefiles -p$(p_tk) --sourcedir=$(d) \
+	dh_movefiles -p$(p_tk) --sourcedir=$(d) \
 		usr/lib/python$(VER)/lib-dynload/_tkinter.so
 endif
 
@@ -742,12 +742,12 @@ ifeq ($(with_gdbm),yes)
 	: # gdbm and dbm modules into $(p_gdbm).
 	dh_installdirs -p$(p_gdbm) \
 		usr/lib/python$(VER)/lib-dynload
-	DH_COMPAT=2 dh_movefiles -p$(p_gdbm) --sourcedir=$(d) \
+	dh_movefiles -p$(p_gdbm) --sourcedir=$(d) \
 		usr/lib/python$(VER)/lib-dynload/gdbm.so
 endif
 
 #	: # The test framework into $(p_base), regression tests dropped
-	DH_COMPAT=2 dh_movefiles -p$(p_base) --sourcedir=$(d) \
+	dh_movefiles -p$(p_base) --sourcedir=$(d) \
 		$(scriptdir)/test/{regrtest.py,test_support.py,__init__.py,pystone.py}
 	rm -rf $(d)/$(scriptdir)/test
 	rm -rf $(d)/$(scriptdir)/bsddb/test
@@ -762,7 +762,7 @@ endif
 	dh_installdirs -p$(p_idle) \
 		usr/bin \
 		usr/share/man/man1
-	DH_COMPAT=2 dh_movefiles -p$(p_idle) \
+	dh_movefiles -p$(p_idle) \
 		usr/lib/python$(VER)/idlelib \
 		usr/bin/idle-python$(VER)
 	cp -p debian/idle-$(PVER).1 $(d_idle)/usr/share/man/man1/
