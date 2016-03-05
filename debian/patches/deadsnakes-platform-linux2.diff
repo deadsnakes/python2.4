@@ -1,0 +1,10 @@
+--- a/configure.in
++++ b/configure.in
+@@ -186,6 +186,7 @@
+ 	    sparc*) MACHDEP="$MACHDEP-sparc" ;;
+ 	    esac
+ 	    ;;
++	linux3) MACHDEP="linux2";;
+ 	cygwin*) MACHDEP="cygwin";;
+ 	darwin*) MACHDEP="darwin";;
+ 	atheos*) MACHDEP="atheos";;

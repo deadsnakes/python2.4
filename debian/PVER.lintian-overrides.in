@@ -1,0 +1,10 @@
+@PVER@ binary: embedded-library usr/lib/@PVER@/lib-dynload/pyexpat.so: expat
+@PVER@ binary: depends-on-python-minimal
+
+# referenced somewhere
+@PVER@ binary: extra-license-file usr/lib/@PVER@/LICENSE.txt
+
+@PVER@ binary: desktop-command-not-in-package
+@PVER@ binary: menu-command-not-in-package
+
+@PVER@ binary: hardening-no-fortify-functions usr/lib/@PVER@/lib-dynload/*

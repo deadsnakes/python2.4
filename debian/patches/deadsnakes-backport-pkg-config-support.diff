@@ -1,0 +1,73 @@
+# Backport python-$(VER).pc file from changeset f8cadfb4a1a2.
+# http://bugs.python.org/issue3585
+# http://hg.python.org/cpython/rev/f8cadfb4a1a2/
+
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -629,6 +629,8 @@
+ 	else true; \
+ 	fi
+ 	(cd $(DESTDIR)$(BINDIR); $(LN) python$(VERSION)$(EXE) $(PYTHON))
++	-rm -f $(DESTDIR)$(LIBPC)/python.pc
++	(cd $(DESTDIR)$(LIBPC); $(LN) -s python-$(VERSION).pc python.pc)
+ 
+ # Install the interpreter with $(VERSION) affixed
+ # This goes into $(exec_prefix)
+@@ -798,8 +800,12 @@
+ # Install the library and miscellaneous stuff needed for extending/embedding
+ # This goes into $(exec_prefix)$(DEBUG_EXT)
+ LIBPL=		$(LIBP)/config$(DEBUG_EXT)
++
++# pkgconfig directory
++LIBPC=		$(LIBDIR)/pkgconfig
++
+ libainstall:	all
+-	@for i in $(LIBDIR) $(LIBP) $(LIBPL); \
++	@for i in $(LIBDIR) $(LIBP) $(LIBPL) $(LIBPC); \
+ 	do \
+ 		if test ! -d $(DESTDIR)$$i; then \
+ 			echo "Creating directory $$i"; \
+@@ -826,6 +832,7 @@
+ 	$(INSTALL_DATA) Modules/Setup $(DESTDIR)$(LIBPL)/Setup
+ 	$(INSTALL_DATA) Modules/Setup.local $(DESTDIR)$(LIBPL)/Setup.local
+ 	$(INSTALL_DATA) Modules/Setup.config $(DESTDIR)$(LIBPL)/Setup.config
++	$(INSTALL_DATA) Misc/python.pc $(DESTDIR)$(LIBPC)/python-$(VERSION).pc
+ 	$(INSTALL_SCRIPT) $(srcdir)/Modules/makesetup $(DESTDIR)$(LIBPL)/makesetup
+ 	$(INSTALL_SCRIPT) $(srcdir)/install-sh $(DESTDIR)$(LIBPL)/install-sh
+ 	@if [ -s Modules/python.exp -a \
+--- a/Misc/ACKS
++++ b/Misc/ACKS
+@@ -503,6 +503,7 @@
+ Case Roole
+ Timothy Roscoe
+ Craig Rowland
++Clinton Roy
+ Jim Roskind
+ Erik van Blokland
+ Just van Rossum
+--- /dev/null
++++ b/Misc/python.pc.in
+@@ -0,0 +1,12 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++Name: Python
++Description: Python library
++Requires:
++Version: @VERSION@
++Libs.private: @LIBS@
++Libs: -L${libdir} -lpython@VERSION@
++Cflags: -I${includedir}/python@VERSION@
+--- a/configure.in
++++ b/configure.in
+@@ -3284,7 +3284,7 @@
+ AC_MSG_RESULT(done)
+ 
+ # generate output files
+-AC_CONFIG_FILES(Makefile.pre Modules/Setup.config)
++AC_CONFIG_FILES(Makefile.pre Modules/Setup.config Misc/python.pc)
+ AC_OUTPUT
+ 
+ echo "creating Setup"

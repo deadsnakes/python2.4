@@ -1,0 +1,1 @@
+@PVER@-tk-dbg binary: hardening-no-fortify-functions usr/lib/@PVER@/lib-dynload/*

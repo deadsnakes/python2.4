@@ -1,0 +1,199 @@
+# distutils: Install an .egg-info file as done for python2.5.
+# Do not encode the python version into the .egg-info name.
+
+--- /dev/null
++++ b/Lib/distutils/command/install_egg_info.py
+@@ -0,0 +1,77 @@
++"""distutils.command.install_egg_info
++
++Implements the Distutils 'install_egg_info' command, for installing
++a package's PKG-INFO metadata."""
++
++
++from distutils.cmd import Command
++from distutils import log, dir_util
++import os, sys, re
++
++class install_egg_info(Command):
++    """Install an .egg-info file for the package"""
++
++    description = "Install package's PKG-INFO metadata as an .egg-info file"
++    user_options = [
++        ('install-dir=', 'd', "directory to install to"),
++    ]
++
++    def initialize_options(self):
++        self.install_dir = None
++
++    def finalize_options(self):
++        self.set_undefined_options('install_lib',('install_dir','install_dir'))
++        basename = "%s-%s.egg-info" % (
++            to_filename(safe_name(self.distribution.get_name())),
++            to_filename(safe_version(self.distribution.get_version()))
++        )
++        self.target = os.path.join(self.install_dir, basename)
++        self.outputs = [self.target]
++
++    def run(self):
++        target = self.target
++        if os.path.isdir(target) and not os.path.islink(target):
++            dir_util.remove_tree(target, dry_run=self.dry_run)
++        elif os.path.exists(target):
++            self.execute(os.unlink,(self.target,),"Removing "+target)
++        elif not os.path.isdir(self.install_dir):
++            self.execute(os.makedirs, (self.install_dir,),
++                         "Creating "+self.install_dir)
++        log.info("Writing %s", target)
++        if not self.dry_run:
++            f = open(target, 'w')
++            self.distribution.metadata.write_pkg_file(f)
++            f.close()
++
++    def get_outputs(self):
++        return self.outputs
++
++
++# The following routines are taken from setuptools' pkg_resources module and
++# can be replaced by importing them from pkg_resources once it is included
++# in the stdlib.
++
++def safe_name(name):
++    """Convert an arbitrary string to a standard distribution name
++
++    Any runs of non-alphanumeric/. characters are replaced with a single '-'.
++    """
++    return re.sub('[^A-Za-z0-9.]+', '-', name)
++
++
++def safe_version(version):
++    """Convert an arbitrary string to a standard version string
++
++    Spaces become dots, and all other non-alphanumeric characters become
++    dashes, with runs of multiple dashes condensed to a single dash.
++    """
++    version = version.replace(' ','.')
++    return re.sub('[^A-Za-z0-9.]+', '-', version)
++
++
++def to_filename(name):
++    """Convert a project or version name to its filename-escaped form
++
++    Any '-' characters are currently replaced with '_'.
++    """
++    return name.replace('-','_')
+--- a/Lib/distutils/command/install.py
++++ b/Lib/distutils/command/install.py
+@@ -601,6 +601,7 @@
+                     ('install_headers', has_headers),
+                     ('install_scripts', has_scripts),
+                     ('install_data',    has_data),
++                    ('install_egg_info', lambda self:True),
+                    ]
+ 
+ # class install
+--- a/Lib/distutils/dist.py
++++ b/Lib/distutils/dist.py
+@@ -1015,7 +1015,10 @@
+                          "license", "description", "long_description",
+                          "keywords", "platforms", "fullname", "contact",
+                          "contact_email", "license", "classifiers",
+-                         "download_url")
++                         "download_url",
++                         # PEP 314
++                         "provides", "requires", "obsoletes",
++                         )
+ 
+     def __init__ (self):
+         self.name = None
+@@ -1032,6 +1035,10 @@
+         self.platforms = None
+         self.classifiers = None
+         self.download_url = None
++        # PEP 314
++        self.provides = None
++        self.requires = None
++        self.obsoletes = None
+ 
+     def write_pkg_info (self, base_dir):
+         """Write the PKG-INFO file into the release tree.
+@@ -1067,6 +1074,43 @@
+ 
+     # write_pkg_info ()
+ 
++    def write_pkg_file (self, file):
++        """Write the PKG-INFO format data to a file object.
++        """
++        version = '1.0'
++        if self.provides or self.requires or self.obsoletes:
++            version = '1.1'
++
++        file.write('Metadata-Version: %s\n' % version)
++        file.write('Name: %s\n' % self.get_name() )
++        file.write('Version: %s\n' % self.get_version() )
++        file.write('Summary: %s\n' % self.get_description() )
++        file.write('Home-page: %s\n' % self.get_url() )
++        file.write('Author: %s\n' % self.get_contact() )
++        file.write('Author-email: %s\n' % self.get_contact_email() )
++        file.write('License: %s\n' % self.get_license() )
++        if self.download_url:
++            file.write('Download-URL: %s\n' % self.download_url)
++
++        long_desc = rfc822_escape( self.get_long_description() )
++        file.write('Description: %s\n' % long_desc)
++
++        keywords = string.join( self.get_keywords(), ',')
++        if keywords:
++            file.write('Keywords: %s\n' % keywords )
++
++        self._write_list(file, 'Platform', self.get_platforms())
++        self._write_list(file, 'Classifier', self.get_classifiers())
++
++        # PEP 314
++        self._write_list(file, 'Requires', self.get_requires())
++        self._write_list(file, 'Provides', self.get_provides())
++        self._write_list(file, 'Obsoletes', self.get_obsoletes())
++
++    def _write_list (self, file, name, values):
++        for value in values:
++            file.write('%s: %s\n' % (name, value))
++
+     # -- Metadata query methods ----------------------------------------
+ 
+     def get_name (self):
+@@ -1125,6 +1169,36 @@
+     def get_download_url(self):
+         return self.download_url or "UNKNOWN"
+ 
++    # PEP 314
++
++    def get_requires(self):
++        return self.requires or []
++
++    def set_requires(self, value):
++        import distutils.versionpredicate
++        for v in value:
++            distutils.versionpredicate.VersionPredicate(v)
++        self.requires = value
++
++    def get_provides(self):
++        return self.provides or []
++
++    def set_provides(self, value):
++        value = [v.strip() for v in value]
++        for v in value:
++            import distutils.versionpredicate
++            distutils.versionpredicate.split_provision(v)
++        self.provides = value
++
++    def get_obsoletes(self):
++        return self.obsoletes or []
++
++    def set_obsoletes(self, value):
++        import distutils.versionpredicate
++        for v in value:
++            distutils.versionpredicate.VersionPredicate(v)
++        self.obsoletes = value
++
+ # class DistributionMetadata
+ 
+ 

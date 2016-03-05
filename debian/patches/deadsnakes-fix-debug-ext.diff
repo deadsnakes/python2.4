@@ -1,0 +1,103 @@
+--- a/configure.in
++++ b/configure.in
+@@ -510,7 +510,7 @@
+ AC_MSG_CHECKING(LIBRARY)
+ if test -z "$LIBRARY"
+ then
+-	LIBRARY='libpython$(VERSION).a'
++	LIBRARY='libpython$(VERSION)$(DEBUG_EXT).a'
+ fi
+ AC_MSG_RESULT($LIBRARY)
+ 
+@@ -636,21 +636,21 @@
+   AC_DEFINE(Py_ENABLE_SHARED, 1, [Defined if Python is built as a shared library.])
+   case $ac_sys_system in
+     BeOS*)
+-          LDLIBRARY='libpython$(VERSION).so'
++          LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).so'
+           ;;
+     CYGWIN*)
+-          LDLIBRARY='libpython$(VERSION).dll.a'
+-          DLLLIBRARY='libpython$(VERSION).dll'
++          LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).dll.a'
++          DLLLIBRARY='libpython$(VERSION)$(DEBUG_EXT).dll'
+           ;;
+     SunOS*)
+-	  LDLIBRARY='libpython$(VERSION).so'
+-	  BLDLIBRARY='-Wl,-R,$(LIBDIR) -L. -lpython$(VERSION)'
++	  LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).so'
++	  BLDLIBRARY='-Wl,-R,$(LIBDIR) -L. -lpython$(VERSION)$(DEBUG_EXT)'
+ 	  RUNSHARED=LD_LIBRARY_PATH=`pwd`:${LD_LIBRARY_PATH}
+ 	  INSTSONAME="$LDLIBRARY".$SOVERSION
+           ;;
+     Linux*|GNU*|NetBSD*|FreeBSD*|DragonFly*)
+-	  LDLIBRARY='libpython$(VERSION).so'
+-	  BLDLIBRARY='-L. -lpython$(VERSION)'
++	  LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).so'
++	  BLDLIBRARY='-L. -lpython$(VERSION)$(DEBUG_EXT)'
+ 	  RUNSHARED=LD_LIBRARY_PATH=`pwd`:${LD_LIBRARY_PATH}
+ 	  case $ac_sys_system in
+ 	      FreeBSD*)
+@@ -660,18 +660,18 @@
+ 	  INSTSONAME="$LDLIBRARY".$SOVERSION
+ 	  ;;
+     hp*|HP*)
+-	  LDLIBRARY='libpython$(VERSION).sl'
+-	  BLDLIBRARY='-Wl,+b,$(LIBDIR) -L. -lpython$(VERSION)'
++	  LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).sl'
++	  BLDLIBRARY='-Wl,+b,$(LIBDIR) -L. -lpython$(VERSION)$(DEBUG_EXT)'
+ 	  RUNSHARED=SHLIB_PATH=`pwd`:${SHLIB_PATH}
+ 	  ;;
+     OSF*)
+-	  LDLIBRARY='libpython$(VERSION).so'
+-	  BLDLIBRARY='-rpath $(LIBDIR) -L. -lpython$(VERSION)'
++	  LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).so'
++	  BLDLIBRARY='-rpath $(LIBDIR) -L. -lpython$(VERSION)$(DEBUG_EXT)'
+ 	  RUNSHARED=LD_LIBRARY_PATH=`pwd`:${LD_LIBRARY_PATH}
+ 	  ;;
+     atheos*)
+-	  LDLIBRARY='libpython$(VERSION).so'
+-	  BLDLIBRARY='-L. -lpython$(VERSION)'
++	  LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).so'
++	  BLDLIBRARY='-L. -lpython$(VERSION)$(DEBUG_EXT)'
+ 	  RUNSHARED=DLL_PATH=`pwd`:${DLL_PATH:-/atheos/sys/libs:/atheos/autolnk/lib}
+ 	  ;;
+   esac
+@@ -679,7 +679,7 @@
+   case $ac_sys_system in
+     CYGWIN*)
+           BLDLIBRARY='$(LIBRARY)'
+-          LDLIBRARY='libpython$(VERSION).dll.a'
++          LDLIBRARY='libpython$(VERSION)$(DEBUG_EXT).dll.a'
+           ;;
+   esac
+ fi
+@@ -729,6 +729,8 @@
+ if test "$Py_DEBUG" = 'true'
+ then
+ 	DEBUG_EXT=_d
++else
++	DEBUG_EXT=
+ fi
+ AC_SUBST(DEBUG_EXT)
+ 
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -355,7 +355,7 @@
+ 	$(AR) cr $@ $(MODOBJS)
+ 	$(RANLIB) $@
+ 
+-libpython$(VERSION).so: $(LIBRARY_OBJS)
++libpython$(VERSION)$(DEBUG_EXT).so: $(LIBRARY_OBJS)
+ 	if test $(INSTSONAME) != $(LDLIBRARY); then \
+ 		$(LDSHARED) -Wl,-h$(INSTSONAME) -o $(INSTSONAME) $(LIBRARY_OBJS) $(SHLIBS) $(LIBC) $(LIBM); \
+ 		$(LN) -f $(INSTSONAME) $@; \
+@@ -363,7 +363,7 @@
+ 		$(LDSHARED) -o $@ $(LIBRARY_OBJS) $(SHLIBS) $(LIBC) $(LIBM); \
+ 	fi
+ 
+-libpython$(VERSION).sl: $(LIBRARY_OBJS)
++libpython$(VERSION)$(DEBUG_EXT).sl: $(LIBRARY_OBJS)
+ 	$(LDSHARED) -o $@ $(LIBRARY_OBJS) $(SHLIBS) $(LIBC) $(LIBM)
+ 
+ # This rule is here for OPENSTEP/Rhapsody/MacOSX. It builds a temporary

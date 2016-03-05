@@ -1,0 +1,13 @@
+--- a/setup.py
++++ b/setup.py
+@@ -553,8 +553,8 @@
+         #
+         # http://www.sleepycat.com/update/index.html
+ 
+-        max_db_ver = (4, 4)
+-        min_db_ver = (3, 2)
++        max_db_ver = (5, 3)
++        min_db_ver = (4, 8)
+         db_setup_debug = False   # verbose debug prints from this script?
+ 
+         def allow_db_ver(db_ver):

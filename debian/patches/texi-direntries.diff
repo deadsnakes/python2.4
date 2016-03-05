@@ -1,0 +1,13 @@
+# DP: Add direntries to texi files
+--- a/Doc/tools/mkinfo
++++ b/Doc/tools/mkinfo
+@@ -58,6 +58,9 @@
+     -f kill-emacs
+ echo Done
+ 
++DOCID=$(basename $TEXINAME .texi)
++sed -i 's/^@top \(.*\)/@top \1 (v2.5)\n@dircategory Python\n@direntry\n* '$DOCID': ('$DOCID').\t\t\1 (v2.5)\n@end direntry\n/' \
++    $TEXINAME
+ 
+ # generate the .info files:
+ 
