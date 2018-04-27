@@ -1,6 +1,16 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:20 -0700
+Subject: tkinter-import
+
+---
+ Lib/lib-tk/Tkinter.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Lib/lib-tk/Tkinter.py b/Lib/lib-tk/Tkinter.py
+index 8234a90..8c18aaf 100644
 --- a/Lib/lib-tk/Tkinter.py
 +++ b/Lib/lib-tk/Tkinter.py
-@@ -35,7 +35,10 @@
+@@ -35,7 +35,10 @@ __version__ = "$Revision: 39220 $"
  import sys
  if sys.platform == "win32":
      import FixTk # Attempt to configure Tcl/Tk without requiring PATH

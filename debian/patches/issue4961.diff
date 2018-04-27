@@ -1,8 +1,18 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:21 -0700
+Subject: issue4961
+
 # DP: Issue #4961: Inconsistent/wrong result of askyesno function in
 # DP: tkMessageBox with Tcl8.5.
+---
+ Lib/lib-tk/tkMessageBox.py | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/Lib/lib-tk/tkMessageBox.py b/Lib/lib-tk/tkMessageBox.py
+index 2c1c1e0..e8ee23e 100644
 --- a/Lib/lib-tk/tkMessageBox.py
 +++ b/Lib/lib-tk/tkMessageBox.py
-@@ -73,11 +73,13 @@
+@@ -73,11 +73,13 @@ def _show(title=None, message=None, icon=None, type=None, **options):
      if title:   options["title"] = title
      if message: options["message"] = message
      res = Message(**options).show()

@@ -1,9 +1,18 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:23 -0700
+Subject: bdist-wininst-notfound
+
 # DP: suggest installation of the pythonX.Y-dev package, if bdist_wininst
 # DP: cannot find the wininst-* files.
+---
+ Lib/distutils/command/bdist_wininst.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
+diff --git a/Lib/distutils/command/bdist_wininst.py b/Lib/distutils/command/bdist_wininst.py
+index b8a49e3..ef3b6d7 100644
 --- a/Lib/distutils/command/bdist_wininst.py
 +++ b/Lib/distutils/command/bdist_wininst.py
-@@ -318,5 +318,8 @@
+@@ -318,5 +318,8 @@ class bdist_wininst (Command):
          # we must use a wininst-x.y.exe built with the same C compiler
          # used for python.  XXX What about mingw, borland, and so on?
          filename = os.path.join(directory, "wininst-%s.exe" % bv)

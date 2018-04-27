@@ -1,6 +1,16 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:20 -0700
+Subject: deb-setup
+
+---
+ setup.py | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index bb7b26e..c882257 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -240,8 +240,9 @@
+@@ -240,8 +240,9 @@ class PyBuildExt(build_ext):
  
      def detect_modules(self):
          # Ensure that /usr/local is always used
@@ -12,7 +22,7 @@
  
          # Add paths to popular package managers on OS X/darwin
          if sys.platform == "darwin":
-@@ -271,6 +272,8 @@
+@@ -271,6 +272,8 @@ class PyBuildExt(build_ext):
              '/lib', '/usr/lib',
              ]
          inc_dirs = self.compiler.include_dirs + ['/usr/include']

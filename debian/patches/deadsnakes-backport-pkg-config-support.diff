@@ -1,10 +1,23 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:23 -0700
+Subject: deadsnakes-backport-pkg-config-support
+
 # Backport python-$(VER).pc file from changeset f8cadfb4a1a2.
 # http://bugs.python.org/issue3585
 # http://hg.python.org/cpython/rev/f8cadfb4a1a2/
+---
+ Makefile.pre.in   |  9 ++++++++-
+ Misc/ACKS         |  1 +
+ Misc/python.pc.in | 12 ++++++++++++
+ configure.in      |  2 +-
+ 4 files changed, 22 insertions(+), 2 deletions(-)
+ create mode 100644 Misc/python.pc.in
 
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index ce2834a..913b953 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -629,6 +629,8 @@
+@@ -629,6 +629,8 @@ bininstall:	altbininstall
  	else true; \
  	fi
  	(cd $(DESTDIR)$(BINDIR); $(LN) python$(VERSION)$(EXE) $(PYTHON))
@@ -13,7 +26,7 @@
  
  # Install the interpreter with $(VERSION) affixed
  # This goes into $(exec_prefix)
-@@ -798,8 +800,12 @@
+@@ -798,8 +800,12 @@ inclinstall:
  # Install the library and miscellaneous stuff needed for extending/embedding
  # This goes into $(exec_prefix)$(DEBUG_EXT)
  LIBPL=		$(LIBP)/config$(DEBUG_EXT)
@@ -27,7 +40,7 @@
  	do \
  		if test ! -d $(DESTDIR)$$i; then \
  			echo "Creating directory $$i"; \
-@@ -826,6 +832,7 @@
+@@ -826,6 +832,7 @@ libainstall:	all
  	$(INSTALL_DATA) Modules/Setup $(DESTDIR)$(LIBPL)/Setup
  	$(INSTALL_DATA) Modules/Setup.local $(DESTDIR)$(LIBPL)/Setup.local
  	$(INSTALL_DATA) Modules/Setup.config $(DESTDIR)$(LIBPL)/Setup.config
@@ -35,9 +48,11 @@
  	$(INSTALL_SCRIPT) $(srcdir)/Modules/makesetup $(DESTDIR)$(LIBPL)/makesetup
  	$(INSTALL_SCRIPT) $(srcdir)/install-sh $(DESTDIR)$(LIBPL)/install-sh
  	@if [ -s Modules/python.exp -a \
+diff --git a/Misc/ACKS b/Misc/ACKS
+index 00ee420..a5751d6 100644
 --- a/Misc/ACKS
 +++ b/Misc/ACKS
-@@ -503,6 +503,7 @@
+@@ -503,6 +503,7 @@ Mike Romberg
  Case Roole
  Timothy Roscoe
  Craig Rowland
@@ -45,6 +60,9 @@
  Jim Roskind
  Erik van Blokland
  Just van Rossum
+diff --git a/Misc/python.pc.in b/Misc/python.pc.in
+new file mode 100644
+index 0000000..873412f
 --- /dev/null
 +++ b/Misc/python.pc.in
 @@ -0,0 +1,12 @@
@@ -60,9 +78,11 @@
 +Libs.private: @LIBS@
 +Libs: -L${libdir} -lpython@VERSION@
 +Cflags: -I${includedir}/python@VERSION@
+diff --git a/configure.in b/configure.in
+index 8d771a1..1eceb2d 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -3284,7 +3284,7 @@
+@@ -3284,7 +3284,7 @@ done
  AC_MSG_RESULT(done)
  
  # generate output files

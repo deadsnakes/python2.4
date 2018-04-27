@@ -1,6 +1,16 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:20 -0700
+Subject: distutils-link
+
+---
+ Lib/distutils/unixccompiler.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/Lib/distutils/unixccompiler.py b/Lib/distutils/unixccompiler.py
+index 5029f65..24108c1 100644
 --- a/Lib/distutils/unixccompiler.py
 +++ b/Lib/distutils/unixccompiler.py
-@@ -194,7 +194,12 @@
+@@ -194,7 +194,12 @@ class UnixCCompiler(CCompiler):
          objects, output_dir = self._fix_object_args(objects, output_dir)
          libraries, library_dirs, runtime_library_dirs = \
              self._fix_lib_args(libraries, library_dirs, runtime_library_dirs)

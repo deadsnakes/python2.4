@@ -1,8 +1,18 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:21 -0700
+Subject: issue7332
+
 # DP: Proposed patch for issue #7332, segfaults in
 # DP: PyMarshal_ReadLastObjectFromFile in import_submodule
+---
+ Python/marshal.c | 20 ++++----------------
+ 1 file changed, 4 insertions(+), 16 deletions(-)
+
+diff --git a/Python/marshal.c b/Python/marshal.c
+index ed87f95..e611383 100644
 --- a/Python/marshal.c
 +++ b/Python/marshal.c
-@@ -761,29 +761,18 @@
+@@ -761,29 +761,18 @@ getfilesize(FILE *fp)
  PyObject *
  PyMarshal_ReadLastObjectFromFile(FILE *fp)
  {
@@ -36,7 +46,7 @@
  			return v;
  		}
  
-@@ -794,7 +783,6 @@
+@@ -794,7 +783,6 @@ PyMarshal_ReadLastObjectFromFile(FILE *fp)
  	 */
  	return PyMarshal_ReadObjectFromFile(fp);
  

@@ -1,7 +1,19 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:21 -0700
+Subject: signal.set_wakeup_fd
+
 # DP: Backport new function signal.set_wakeup_fd from the trunk
+---
+ Include/pyerrors.h      |  3 +++
+ Lib/test/test_signal.py | 57 +++++++++++++++++++++++++++++++++++++++++++++++++
+ Modules/signalmodule.c  | 53 ++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 112 insertions(+), 1 deletion(-)
+
+diff --git a/Include/pyerrors.h b/Include/pyerrors.h
+index f433cc0..b5ae712 100644
 --- a/Include/pyerrors.h
 +++ b/Include/pyerrors.h
-@@ -139,6 +139,9 @@
+@@ -139,6 +139,9 @@ PyAPI_FUNC(int) PyErr_WarnExplicit(PyObject *, const char *,
  PyAPI_FUNC(int) PyErr_CheckSignals(void);
  PyAPI_FUNC(void) PyErr_SetInterrupt(void);
  
@@ -11,9 +23,11 @@
  /* Support for adding program text to SyntaxErrors */
  PyAPI_FUNC(void) PyErr_SyntaxLocation(const char *, int);
  PyAPI_FUNC(PyObject *) PyErr_ProgramText(const char *, int);
+diff --git a/Lib/test/test_signal.py b/Lib/test/test_signal.py
+index 042cfa9..aac5361 100644
 --- a/Lib/test/test_signal.py
 +++ b/Lib/test/test_signal.py
-@@ -71,3 +71,60 @@
+@@ -71,3 +71,60 @@ finally:
      signal.signal(signal.SIGUSR1, usr1)
      signal.signal(signal.SIGUSR2, usr2)
      signal.signal(signal.SIGALRM, alrm)
@@ -74,6 +88,8 @@
 +
 +if __name__ == "__main__":
 +    test_main()
+diff --git a/Modules/signalmodule.c b/Modules/signalmodule.c
+index a729604..0c71414 100644
 --- a/Modules/signalmodule.c
 +++ b/Modules/signalmodule.c
 @@ -12,6 +12,8 @@
@@ -85,7 +101,7 @@
  #ifndef SIG_ERR
  #define SIG_ERR ((PyOS_sighandler_t)(-1))
  #endif
-@@ -75,6 +77,8 @@
+@@ -75,6 +77,8 @@ static struct {
          PyObject *func;
  } Handlers[NSIG];
  
@@ -94,7 +110,7 @@
  static int is_tripped = 0; /* Speed up sigcheck() when none tripped */
  
  static PyObject *DefaultHandler;
-@@ -125,6 +129,8 @@
+@@ -125,6 +129,8 @@ signal_handler(int sig_num)
  		is_tripped++;
  		Handlers[sig_num].tripped = 1;
  		Py_AddPendingCall(checksignals_witharg, NULL);
@@ -103,7 +119,7 @@
  #ifdef WITH_THREAD
  	}
  #endif
-@@ -264,6 +270,50 @@
+@@ -264,6 +270,50 @@ None -- if an unknown handler is in effect\n\
  anything else -- the callable Python object used as a handler");
  
  
@@ -154,7 +170,7 @@
  /* List of functions defined in the module */
  static PyMethodDef signal_methods[] = {
  #ifdef HAVE_ALARM
-@@ -271,11 +321,12 @@
+@@ -271,11 +321,12 @@ static PyMethodDef signal_methods[] = {
  #endif
  	{"signal",	        signal_signal, METH_VARARGS, signal_doc},
  	{"getsignal",	        signal_getsignal, METH_VARARGS, getsignal_doc},

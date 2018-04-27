@@ -1,33 +1,22 @@
---- a/Python/sysmodule.c
-+++ b/Python/sysmodule.c
-@@ -1069,6 +1069,11 @@
- 	SET_SYS_FROM_STRING("winver",
- 			    PyString_FromString(PyWin_DLLVersionString));
- #endif
-+#ifdef Py_DEBUG
-+	PyDict_SetItemString(sysdict, "pydebug", Py_True);
-+#else
-+	PyDict_SetItemString(sysdict, "pydebug", Py_False);
-+#endif
- #undef SET_SYS_FROM_STRING
- 	if (warnoptions == NULL) {
- 		warnoptions = PyList_New(0);
---- a/Python/dynload_shlib.c
-+++ b/Python/dynload_shlib.c
-@@ -46,6 +46,10 @@
-         {"module.exe", "rb", C_EXTENSION},
-         {"MODULE.EXE", "rb", C_EXTENSION},
- #else
-+#ifdef Py_DEBUG
-+	{"_d.so", "rb", C_EXTENSION},
-+	{"module_d.so", "rb", C_EXTENSION},
-+#endif
- 	{".so", "rb", C_EXTENSION},
- 	{"module.so", "rb", C_EXTENSION},
- #endif
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:20 -0700
+Subject: debug-build
+
+---
+ Lib/distutils/command/build.py |  7 ++++---
+ Lib/distutils/sysconfig.py     |  5 +++--
+ Lib/site.py                    |  2 +-
+ Makefile.pre.in                | 10 ++++++----
+ Python/dynload_shlib.c         |  4 ++++
+ Python/sysmodule.c             |  5 +++++
+ configure.in                   |  8 +++++++-
+ 7 files changed, 30 insertions(+), 11 deletions(-)
+
+diff --git a/Lib/distutils/command/build.py b/Lib/distutils/command/build.py
+index 8ada3bf..1714af9 100644
 --- a/Lib/distutils/command/build.py
 +++ b/Lib/distutils/command/build.py
-@@ -68,15 +68,16 @@
+@@ -68,15 +68,16 @@ class build (Command):
      def finalize_options (self):
  
          plat_specifier = ".%s-%s" % (get_platform(), sys.version[0:3])
@@ -46,7 +35,7 @@
  
          # 'build_lib' is the actual directory that we will use for this
          # particular module distribution -- if user didn't supply it, pick
-@@ -91,7 +92,7 @@
+@@ -91,7 +92,7 @@ class build (Command):
          # "build/temp.<plat>"
          if self.build_temp is None:
              self.build_temp = os.path.join(self.build_base,
@@ -55,9 +44,11 @@
          if self.build_scripts is None:
              self.build_scripts = os.path.join(self.build_base,
                                                'scripts-' + sys.version[0:3])
+diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
+index 482e1ff..090c154 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -65,7 +65,8 @@
+@@ -65,7 +65,8 @@ def get_python_inc(plat_specific=0, prefix=None):
                  if not os.path.exists(inc_dir):
                      inc_dir = os.path.join(os.path.dirname(base), "Include")
              return inc_dir
@@ -67,7 +58,7 @@
      elif os.name == "nt":
          return os.path.join(prefix, "include")
      elif os.name == "mac":
-@@ -207,7 +208,7 @@
+@@ -207,7 +208,7 @@ def get_makefile_filename():
      if python_build:
          return os.path.join(os.path.dirname(sys.executable), "Makefile")
      lib_dir = get_python_lib(plat_specific=1, standard_lib=1)
@@ -76,9 +67,11 @@
  
  
  def parse_config_h(fp, g=None):
+diff --git a/Lib/site.py b/Lib/site.py
+index 60f4d57..940e127 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
-@@ -103,7 +103,7 @@
+@@ -103,7 +103,7 @@ def addbuilddir():
      """Append ./build/lib.<platform> in case we're running in the build dir
      (especially for Guido :-)"""
      from distutils.util import get_platform
@@ -87,9 +80,77 @@
      s = os.path.join(os.path.dirname(sys.path[-1]), s)
      sys.path.append(s)
  
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index d125bf6..1fd3f5c 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -88,8 +88,8 @@ SCRIPTDIR=	$(prefix)/lib
+ # Detailed destination directories
+ BINLIBDEST=	$(LIBDIR)/python$(VERSION)
+ LIBDEST=	$(SCRIPTDIR)/python$(VERSION)
+-INCLUDEPY=	$(INCLUDEDIR)/python$(VERSION)
+-CONFINCLUDEPY=	$(CONFINCLUDEDIR)/python$(VERSION)
++INCLUDEPY=	$(INCLUDEDIR)/python$(VERSION)$(DEBUG_EXT)
++CONFINCLUDEPY=	$(CONFINCLUDEDIR)/python$(VERSION)$(DEBUG_EXT)
+ LIBP=		$(LIBDIR)/python$(VERSION)
+ 
+ # Symbols used for using shared libraries
+@@ -102,6 +102,8 @@ DESTSHARED=	$(BINLIBDEST)/lib-dynload
+ EXE=		@EXEEXT@
+ BUILDEXE=	@BUILDEXEEXT@
+ 
++DEBUG_EXT=	@DEBUG_EXT@
++
+ # Short name and location for Mac OS X Python framework
+ UNIVERSALSDK=@UNIVERSALSDK@
+ PYTHONFRAMEWORK=	@PYTHONFRAMEWORK@
+@@ -794,8 +796,8 @@ inclinstall:
+ 	$(INSTALL_DATA) pyconfig.h $(DESTDIR)$(CONFINCLUDEPY)/pyconfig.h
+ 
+ # Install the library and miscellaneous stuff needed for extending/embedding
+-# This goes into $(exec_prefix)
+-LIBPL=		$(LIBP)/config
++# This goes into $(exec_prefix)$(DEBUG_EXT)
++LIBPL=		$(LIBP)/config$(DEBUG_EXT)
+ libainstall:	all
+ 	@for i in $(LIBDIR) $(LIBP) $(LIBPL); \
+ 	do \
+diff --git a/Python/dynload_shlib.c b/Python/dynload_shlib.c
+index 960e5c0..d580261 100644
+--- a/Python/dynload_shlib.c
++++ b/Python/dynload_shlib.c
+@@ -46,6 +46,10 @@ const struct filedescr _PyImport_DynLoadFiletab[] = {
+         {"module.exe", "rb", C_EXTENSION},
+         {"MODULE.EXE", "rb", C_EXTENSION},
+ #else
++#ifdef Py_DEBUG
++	{"_d.so", "rb", C_EXTENSION},
++	{"module_d.so", "rb", C_EXTENSION},
++#endif
+ 	{".so", "rb", C_EXTENSION},
+ 	{"module.so", "rb", C_EXTENSION},
+ #endif
+diff --git a/Python/sysmodule.c b/Python/sysmodule.c
+index d2229a6..c30019a 100644
+--- a/Python/sysmodule.c
++++ b/Python/sysmodule.c
+@@ -1069,6 +1069,11 @@ _PySys_Init(void)
+ 	SET_SYS_FROM_STRING("winver",
+ 			    PyString_FromString(PyWin_DLLVersionString));
+ #endif
++#ifdef Py_DEBUG
++	PyDict_SetItemString(sysdict, "pydebug", Py_True);
++#else
++	PyDict_SetItemString(sysdict, "pydebug", Py_False);
++#endif
+ #undef SET_SYS_FROM_STRING
+ 	if (warnoptions == NULL) {
+ 		warnoptions = PyList_New(0);
+diff --git a/configure.in b/configure.in
+index 237d273..bbc6586 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -715,6 +715,12 @@
+@@ -715,6 +715,12 @@ else AC_MSG_RESULT(no); Py_DEBUG='false'
  fi],
  [AC_MSG_RESULT(no)])
  
@@ -102,7 +163,7 @@
  # XXX Shouldn't the code above that fiddles with BASECFLAGS and OPT be
  # merged with this chunk of code?
  
-@@ -1362,7 +1368,7 @@
+@@ -1362,7 +1368,7 @@ then
  	case $ac_sys_system in
  	hp*|HP*)   SO=.sl;;
  	CYGWIN*)   SO=.dll;;
@@ -111,36 +172,3 @@
  	esac
  else
  	# this might also be a termcap variable, see #610332
---- a/Makefile.pre.in
-+++ b/Makefile.pre.in
-@@ -88,8 +88,8 @@
- # Detailed destination directories
- BINLIBDEST=	$(LIBDIR)/python$(VERSION)
- LIBDEST=	$(SCRIPTDIR)/python$(VERSION)
--INCLUDEPY=	$(INCLUDEDIR)/python$(VERSION)
--CONFINCLUDEPY=	$(CONFINCLUDEDIR)/python$(VERSION)
-+INCLUDEPY=	$(INCLUDEDIR)/python$(VERSION)$(DEBUG_EXT)
-+CONFINCLUDEPY=	$(CONFINCLUDEDIR)/python$(VERSION)$(DEBUG_EXT)
- LIBP=		$(LIBDIR)/python$(VERSION)
- 
- # Symbols used for using shared libraries
-@@ -102,6 +102,8 @@
- EXE=		@EXEEXT@
- BUILDEXE=	@BUILDEXEEXT@
- 
-+DEBUG_EXT=	@DEBUG_EXT@
-+
- # Short name and location for Mac OS X Python framework
- UNIVERSALSDK=@UNIVERSALSDK@
- PYTHONFRAMEWORK=	@PYTHONFRAMEWORK@
-@@ -794,8 +796,8 @@
- 	$(INSTALL_DATA) pyconfig.h $(DESTDIR)$(CONFINCLUDEPY)/pyconfig.h
- 
- # Install the library and miscellaneous stuff needed for extending/embedding
--# This goes into $(exec_prefix)
--LIBPL=		$(LIBP)/config
-+# This goes into $(exec_prefix)$(DEBUG_EXT)
-+LIBPL=		$(LIBP)/config$(DEBUG_EXT)
- libainstall:	all
- 	@for i in $(LIBDIR) $(LIBP) $(LIBPL); \
- 	do \

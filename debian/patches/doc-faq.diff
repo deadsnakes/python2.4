@@ -1,4 +1,14 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:23 -0700
+Subject: doc-faq
+
 # DP: Mention the FAQ on the documentation index page.
+---
+ Doc/html/index.html.in | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/Doc/html/index.html.in b/Doc/html/index.html.in
+index 412f1d5..dff6a53 100644
 --- a/Doc/html/index.html.in
 +++ b/Doc/html/index.html.in
 @@ -127,6 +127,24 @@

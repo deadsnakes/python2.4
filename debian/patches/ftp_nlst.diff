@@ -1,8 +1,17 @@
-# DP: Fix urllib violating rfc 959 (FTP NLST)
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:22 -0700
+Subject: ftp_nlst
 
+# DP: Fix urllib violating rfc 959 (FTP NLST)
+---
+ Lib/urllib.py | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/Lib/urllib.py b/Lib/urllib.py
+index 802d9b7..890fdf5 100644
 --- a/Lib/urllib.py
 +++ b/Lib/urllib.py
-@@ -769,13 +769,6 @@
+@@ -769,13 +769,6 @@ class ftpwrapper:
              self.ftp.voidcmd(cmd)
          conn = None
          if file and not isdir:

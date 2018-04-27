@@ -1,8 +1,17 @@
-# DP: use -fwrapv when GCC supports it.
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:22 -0700
+Subject: gcc-fwrapv
 
+# DP: use -fwrapv when GCC supports it.
+---
+ configure.in | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index f0b37bb..1f233c2 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -752,6 +752,10 @@
+@@ -752,6 +752,10 @@ if test -z "$OPT"
  then
      case $GCC in
      yes)
@@ -13,7 +22,7 @@
  	case $ac_cv_prog_cc_g in
  	yes)
  	    if test "$Py_DEBUG" = 'true' ; then
-@@ -759,11 +763,11 @@
+@@ -759,11 +763,11 @@ then
  		# debug builds.
  		OPT="-g -Wall -Wstrict-prototypes"
  	    else

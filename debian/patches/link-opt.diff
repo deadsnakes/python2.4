@@ -1,6 +1,16 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:20 -0700
+Subject: link-opt
+
+---
+ configure.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 2770b1e..237d273 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -1452,7 +1452,7 @@
+@@ -1452,7 +1452,7 @@ then
  			fi
  		fi
  		;;
@@ -9,7 +19,7 @@
  	BSD/OS*/4*) LDSHARED="gcc -shared";;
  	FreeBSD*)
  		if [[ "`$CC -dM -E - </dev/null | grep __ELF__`" != "" ]]
-@@ -1537,7 +1537,7 @@
+@@ -1537,7 +1537,7 @@ then
  	    LINKFORSHARED="-Wl,-E -Wl,+s";;
  #	    LINKFORSHARED="-Wl,-E -Wl,+s -Wl,+b\$(BINLIBDEST)/lib-dynload";;
  	BSD/OS/4*) LINKFORSHARED="-Xlinker -export-dynamic";;

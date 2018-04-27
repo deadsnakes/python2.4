@@ -1,7 +1,17 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:21 -0700
+Subject: emacs-version
+
 # DP: Allow the info docs to be built with emacs23.
+---
+ Doc/info/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Doc/info/Makefile b/Doc/info/Makefile
+index 3dbbd74..cffe985 100644
 --- a/Doc/info/Makefile
 +++ b/Doc/info/Makefile
-@@ -34,10 +34,10 @@
+@@ -34,10 +34,10 @@ $(WHATSNEW):	python$(VERSION)-$(WHATSNEW).info
  
  check-emacs-version:
  	@v="`$(EMACS) --version 2>&1 | egrep '^(GNU |X)Emacs [12]*'`"; \

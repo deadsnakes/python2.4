@@ -1,8 +1,17 @@
-# DP: Fix building the source within exec_prefix.
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:22 -0700
+Subject: distutils-exec-prefix
 
+# DP: Fix building the source within exec_prefix.
+---
+ Lib/distutils/command/build_ext.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Lib/distutils/command/build_ext.py b/Lib/distutils/command/build_ext.py
+index b210300..15f2057 100644
 --- a/Lib/distutils/command/build_ext.py
 +++ b/Lib/distutils/command/build_ext.py
-@@ -186,7 +186,7 @@
+@@ -186,7 +186,7 @@ class build_ext (Command):
          # for extensions under Cygwin and AtheOS Python's library directory must be
          # appended to library_dirs
          if sys.platform[:6] == 'cygwin' or sys.platform[:6] == 'atheos':

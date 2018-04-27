@@ -1,30 +1,20 @@
---- a/Demo/tkinter/guido/tkman.py
-+++ b/Demo/tkinter/guido/tkman.py
-@@ -9,8 +9,8 @@
- from Tkinter import *
- from ManPage import ManPage
- 
--MANNDIRLIST = ['/depot/sundry/man/mann','/usr/local/man/mann']
--MAN3DIRLIST = ['/depot/sundry/man/man3','/usr/local/man/man3']
-+MANNDIRLIST = ['/depot/sundry/man/mann','/usr/share/man/mann']
-+MAN3DIRLIST = ['/depot/sundry/man/man3','/usr/share/man/man3']
- 
- foundmanndir = 0
- for dir in MANNDIRLIST:
---- a/Demo/tkinter/guido/ManPage.py
-+++ b/Demo/tkinter/guido/ManPage.py
-@@ -189,8 +189,9 @@
- def test():
-     import os
-     import sys
--    # XXX This directory may be different on your system
--    MANDIR = '/usr/local/man/mann'
-+    # XXX This directory may be different on your system,
-+    #     it is here set for Debian GNU/Linux.
-+    MANDIR = '/usr/share/man'
-     DEFAULTPAGE = 'Tcl'
-     formatted = 0
-     if sys.argv[1:] and sys.argv[1] == '-f':
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:20 -0700
+Subject: deb-locations
+
+---
+ Demo/scripts/ftpstats.py       | 5 +++--
+ Demo/tkinter/guido/ManPage.py  | 5 +++--
+ Demo/tkinter/guido/tkman.py    | 4 ++--
+ Lib/pydoc.py                   | 4 ++++
+ Lib/site.py                    | 6 ++++++
+ Misc/python.man                | 2 +-
+ Tools/faqwiz/faqconf.py        | 2 +-
+ Tools/webchecker/webchecker.py | 3 ++-
+ 8 files changed, 22 insertions(+), 9 deletions(-)
+
+diff --git a/Demo/scripts/ftpstats.py b/Demo/scripts/ftpstats.py
+index b37a58d..e1a8537 100755
 --- a/Demo/scripts/ftpstats.py
 +++ b/Demo/scripts/ftpstats.py
 @@ -6,7 +6,8 @@
@@ -37,7 +27,7 @@
  
  # The script must be run on the host where the ftp daemon runs.
  # (At CWI this is currently buizerd.)
-@@ -34,7 +35,7 @@
+@@ -34,7 +35,7 @@ def main():
              maxitems = string.atoi(a)
          if o == '-s':
              search = a
@@ -46,43 +36,42 @@
      if args: file = args[0]
      if file == '-':
          f = sys.stdin
---- a/Misc/python.man
-+++ b/Misc/python.man
-@@ -294,7 +294,7 @@
- These are subject to difference depending on local installation
- conventions; ${prefix} and ${exec_prefix} are installation-dependent
- and should be interpreted as for GNU software; they may be the same.
--The default for both is \fI/usr/local\fP.
-+On Debian GNU/{Hurd,Linux} the default for both is \fI/usr\fP.
- .IP \fI${exec_prefix}/bin/python\fP
- Recommended location of the interpreter.
- .PP
---- a/Tools/faqwiz/faqconf.py
-+++ b/Tools/faqwiz/faqconf.py
-@@ -21,7 +21,7 @@
- OWNEREMAIL = "nobody@anywhere.org"      # Email for feedback
- HOMEURL = "http://www.python.org"       # Related home page
- HOMENAME = "Python home"                # Name of related home page
--RCSBINDIR = "/usr/local/bin/"           # Directory containing RCS commands
-+RCSBINDIR = "/usr/bin/"			# Directory containing RCS commands
-                                         # (must end in a slash)
+diff --git a/Demo/tkinter/guido/ManPage.py b/Demo/tkinter/guido/ManPage.py
+index 7d6fe00..957213d 100755
+--- a/Demo/tkinter/guido/ManPage.py
++++ b/Demo/tkinter/guido/ManPage.py
+@@ -189,8 +189,9 @@ ManPage = ReadonlyManPage
+ def test():
+     import os
+     import sys
+-    # XXX This directory may be different on your system
+-    MANDIR = '/usr/local/man/mann'
++    # XXX This directory may be different on your system,
++    #     it is here set for Debian GNU/Linux.
++    MANDIR = '/usr/share/man'
+     DEFAULTPAGE = 'Tcl'
+     formatted = 0
+     if sys.argv[1:] and sys.argv[1] == '-f':
+diff --git a/Demo/tkinter/guido/tkman.py b/Demo/tkinter/guido/tkman.py
+index 11d9690..7e395db 100755
+--- a/Demo/tkinter/guido/tkman.py
++++ b/Demo/tkinter/guido/tkman.py
+@@ -9,8 +9,8 @@ import regex
+ from Tkinter import *
+ from ManPage import ManPage
  
- # Parameters you can normally leave alone
---- a/Tools/webchecker/webchecker.py
-+++ b/Tools/webchecker/webchecker.py
-@@ -19,7 +19,8 @@
- a directory listing is returned.  Now, you can point webchecker to the
- document tree in the local file system of your HTTP daemon, and have
- most of it checked.  In fact the default works this way if your local
--web tree is located at /usr/local/etc/httpd/htdpcs (the default for
-+web tree is located at /var/www, which is the default for Debian
-+GNU/Linux. Other systems use /usr/local/etc/httpd/htdocs (the default for
- the NCSA HTTP daemon and probably others).
+-MANNDIRLIST = ['/depot/sundry/man/mann','/usr/local/man/mann']
+-MAN3DIRLIST = ['/depot/sundry/man/man3','/usr/local/man/man3']
++MANNDIRLIST = ['/depot/sundry/man/mann','/usr/share/man/mann']
++MAN3DIRLIST = ['/depot/sundry/man/man3','/usr/share/man/man3']
  
- Report printed:
+ foundmanndir = 0
+ for dir in MANNDIRLIST:
+diff --git a/Lib/pydoc.py b/Lib/pydoc.py
+index c2c0047..0fab806 100755
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
-@@ -1636,6 +1636,7 @@
+@@ -1636,6 +1636,7 @@ class Helper:
          for dir in [os.environ.get('PYTHONDOCS'),
                      homedir and os.path.join(homedir, 'doc'),
                      os.path.join(execdir, 'doc'),
@@ -90,7 +79,7 @@
                      '/usr/doc/python-docs-' + split(sys.version)[0],
                      '/usr/doc/python-' + split(sys.version)[0],
                      '/usr/doc/python-docs-' + sys.version[:3],
-@@ -1750,6 +1751,9 @@
+@@ -1750,6 +1751,9 @@ Here is a list of available topics.  Enter any topic name to get more help.
  Sorry, topic and keyword documentation is not available because the Python
  HTML documentation files could not be found.  If you have installed them,
  please set the environment variable PYTHONDOCS to indicate their location.
@@ -100,9 +89,11 @@
  ''')
              return
          target = self.topics.get(topic, self.keywords.get(topic))
+diff --git a/Lib/site.py b/Lib/site.py
+index 2207ec5..60f4d57 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
-@@ -18,6 +18,11 @@
+@@ -18,6 +18,11 @@ On other platforms (mainly Mac and Windows), it uses just sys.prefix
  resulting directories, if they exist, are appended to sys.path, and
  also inspected for path configuration files.
  
@@ -114,7 +105,7 @@
  A path configuration file is a file whose name has the form
  <package>.pth; its contents are additional directories (one per line)
  to be added to sys.path.  Non-existing directories (or
-@@ -173,6 +178,7 @@
+@@ -173,6 +178,7 @@ def addsitepackages(known_paths):
      prefixes = [sys.prefix]
      if sys.exec_prefix != sys.prefix:
          prefixes.append(sys.exec_prefix)
@@ -122,3 +113,43 @@
      for prefix in prefixes:
          if prefix:
              if sys.platform in ('os2emx', 'riscos'):
+diff --git a/Misc/python.man b/Misc/python.man
+index a5b7177..fe4e249 100644
+--- a/Misc/python.man
++++ b/Misc/python.man
+@@ -294,7 +294,7 @@ exception).  Error messages are written to stderr.
+ These are subject to difference depending on local installation
+ conventions; ${prefix} and ${exec_prefix} are installation-dependent
+ and should be interpreted as for GNU software; they may be the same.
+-The default for both is \fI/usr/local\fP.
++On Debian GNU/{Hurd,Linux} the default for both is \fI/usr\fP.
+ .IP \fI${exec_prefix}/bin/python\fP
+ Recommended location of the interpreter.
+ .PP
+diff --git a/Tools/faqwiz/faqconf.py b/Tools/faqwiz/faqconf.py
+index 0057a93..942b533 100644
+--- a/Tools/faqwiz/faqconf.py
++++ b/Tools/faqwiz/faqconf.py
+@@ -21,7 +21,7 @@ OWNERNAME = "FAQ owner"                 # Name for feedback
+ OWNEREMAIL = "nobody@anywhere.org"      # Email for feedback
+ HOMEURL = "http://www.python.org"       # Related home page
+ HOMENAME = "Python home"                # Name of related home page
+-RCSBINDIR = "/usr/local/bin/"           # Directory containing RCS commands
++RCSBINDIR = "/usr/bin/"			# Directory containing RCS commands
+                                         # (must end in a slash)
+ 
+ # Parameters you can normally leave alone
+diff --git a/Tools/webchecker/webchecker.py b/Tools/webchecker/webchecker.py
+index e5246cd..bcc3f87 100755
+--- a/Tools/webchecker/webchecker.py
++++ b/Tools/webchecker/webchecker.py
+@@ -19,7 +19,8 @@ file index.html in that directory is returned if it exists, otherwise
+ a directory listing is returned.  Now, you can point webchecker to the
+ document tree in the local file system of your HTTP daemon, and have
+ most of it checked.  In fact the default works this way if your local
+-web tree is located at /usr/local/etc/httpd/htdpcs (the default for
++web tree is located at /var/www, which is the default for Debian
++GNU/Linux. Other systems use /usr/local/etc/httpd/htdocs (the default for
+ the NCSA HTTP daemon and probably others).
+ 
+ Report printed:

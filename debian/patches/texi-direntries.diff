@@ -1,7 +1,17 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:21 -0700
+Subject: texi-direntries
+
 # DP: Add direntries to texi files
+---
+ Doc/tools/mkinfo | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Doc/tools/mkinfo b/Doc/tools/mkinfo
+index be75168..994fe1d 100755
 --- a/Doc/tools/mkinfo
 +++ b/Doc/tools/mkinfo
-@@ -58,6 +58,9 @@
+@@ -58,6 +58,9 @@ run $EMACS -batch -q --no-site-file -l $TOOLSDIR/py2texi.el \
      -f kill-emacs
  echo Done
  

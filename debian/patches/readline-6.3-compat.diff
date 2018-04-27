@@ -1,6 +1,16 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:24 -0700
+Subject: readline-6.3-compat
+
+---
+ Modules/readline.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/Modules/readline.c b/Modules/readline.c
+index 07c92b2..67fd4f2 100644
 --- a/Modules/readline.c
 +++ b/Modules/readline.c
-@@ -714,12 +714,27 @@
+@@ -714,12 +714,27 @@ setup_readline(void)
  	rl_bind_key_in_map ('\t', rl_complete, emacs_meta_keymap);
  	rl_bind_key_in_map ('\033', rl_complete, emacs_meta_keymap);
  	/* Set our hook functions */

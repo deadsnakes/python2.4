@@ -1,7 +1,17 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:21 -0700
+Subject: issue961805
+
 # DP: Fix issue 961805, Text.edit_modified() fails.
+---
+ Lib/lib-tk/Tkinter.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/Lib/lib-tk/Tkinter.py b/Lib/lib-tk/Tkinter.py
+index 8c18aaf..fb6302a 100644
 --- a/Lib/lib-tk/Tkinter.py
 +++ b/Lib/lib-tk/Tkinter.py
-@@ -2846,8 +2846,7 @@
+@@ -2846,8 +2846,7 @@ class Text(Widget):
          and edit_undo
  
          """

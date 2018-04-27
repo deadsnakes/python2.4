@@ -1,11 +1,20 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:22 -0700
+Subject: locale-module
+
 # DP:   * Lib/locale.py:
 # DP:     - Don't map 'utf8', 'utf-8' to 'utf', which is not a known encoding
 # DP:       for glibc.
 # DP:     - Update locale aliaes from /usr/share/X11/locale/locale.alias.
+---
+ Lib/locale.py | 651 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 622 insertions(+), 29 deletions(-)
 
+diff --git a/Lib/locale.py b/Lib/locale.py
+index 377cdc1..fe949e5 100644
 --- a/Lib/locale.py
 +++ b/Lib/locale.py
-@@ -427,7 +427,7 @@
+@@ -427,7 +427,7 @@ else:
  # The following data was extracted from the locale.alias file which
  # comes with X11 and then hand edited removing the explicit encoding
  # definitions and adding some more aliases. The file is usually
@@ -14,7 +23,7 @@
  #
  
  #
-@@ -463,9 +463,9 @@
+@@ -463,9 +463,9 @@ encoding_alias = {
          'ajec':                         'eucJP',
          'eucjp':                        'eucJP',
          'ujis':                         'eucJP',
@@ -27,7 +36,7 @@
  }
  
  #
-@@ -475,97 +475,435 @@
+@@ -475,97 +475,435 @@ encoding_alias = {
  # language name is needed to interpret the given encoding alias
  # correctly (CJK codes often have this need).
  #
@@ -475,7 +484,7 @@
          'iso-8859-1':                    'en_US.ISO8859-1',
          'iso-8859-15':                   'en_US.ISO8859-15',
          'iso8859-1':                     'en_US.ISO8859-1',
-@@ -574,10 +912,23 @@
+@@ -574,10 +912,23 @@ locale_alias = {
          'iso_8859_15':                   'en_US.ISO8859-15',
          'it':                            'it_IT.ISO8859-1',
          'it_ch':                         'it_CH.ISO8859-1',
@@ -501,7 +510,7 @@
          'ja':                            'ja_JP.eucJP',
          'ja.jis':                        'ja_JP.JIS7',
          'ja.sjis':                       'ja_JP.SJIS',
-@@ -586,78 +937,320 @@
+@@ -586,78 +937,320 @@ locale_alias = {
          'ja_jp.euc':                     'ja_JP.eucJP',
          'ja_jp.eucjp':                   'ja_JP.eucJP',
          'ja_jp.iso-2022-jp':             'ja_JP.JIS7',

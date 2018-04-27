@@ -1,8 +1,18 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:22 -0700
+Subject: issue8329
+
 # DP: Fix issue #8329: Don't return the same lists from select.select
 # DP: when no fds are changed.
+---
+ Modules/selectmodule.c | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/Modules/selectmodule.c b/Modules/selectmodule.c
+index 25e2310..3ffe114 100644
 --- a/Modules/selectmodule.c
 +++ b/Modules/selectmodule.c
-@@ -280,14 +280,6 @@
+@@ -280,14 +280,6 @@ select_select(PyObject *self, PyObject *args)
  		PyErr_SetFromErrno(SelectError);
  	}
  #endif

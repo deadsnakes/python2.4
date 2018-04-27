@@ -1,6 +1,16 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:23 -0700
+Subject: deadsnakes-force-info-docs
+
+---
+ Doc/tools/mkinfo | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/Doc/tools/mkinfo b/Doc/tools/mkinfo
+index 994fe1d..8351696 100755
 --- a/Doc/tools/mkinfo
 +++ b/Doc/tools/mkinfo
-@@ -64,5 +64,9 @@
+@@ -64,5 +64,9 @@ sed -i 's/^@top \(.*\)/@top \1 (v2.5)\n@dircategory Python\n@direntry\n* '$DOCID
  
  # generate the .info files:
  

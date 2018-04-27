@@ -1,6 +1,16 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:20 -0700
+Subject: distutils-sysconfig
+
+---
+ Lib/distutils/sysconfig.py | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
+index c4df8dc..482e1ff 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -146,8 +146,9 @@
+@@ -146,8 +146,9 @@ def customize_compiler(compiler):
      varies across Unices and is stored in Python's Makefile.
      """
      if compiler.compiler_type == "unix":
@@ -12,7 +22,7 @@
  
          if os.environ.has_key('CC'):
              cc = os.environ['CC']
-@@ -161,11 +162,15 @@
+@@ -161,11 +162,15 @@ def customize_compiler(compiler):
              cpp = cc + " -E"           # not always
          if os.environ.has_key('LDFLAGS'):
              ldshared = ldshared + ' ' + os.environ['LDFLAGS']

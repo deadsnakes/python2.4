@@ -1,8 +1,18 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:21 -0700
+Subject: issue1923
+
 # DP: Issue #1923: Fixed the removal of meaningful spaces when PKG-INFO is
 # DP: generated in Distutils.
+---
+ Lib/distutils/util.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Lib/distutils/util.py b/Lib/distutils/util.py
+index 177c779..8286b9f 100644
 --- a/Lib/distutils/util.py
 +++ b/Lib/distutils/util.py
-@@ -509,6 +509,5 @@
+@@ -509,6 +509,5 @@ def rfc822_escape (header):
      RFC-822 header, by ensuring there are 8 spaces space after each newline.
      """
      lines = string.split(header, '\n')

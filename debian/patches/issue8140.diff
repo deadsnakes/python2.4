@@ -1,7 +1,17 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:21 -0700
+Subject: issue8140
+
 # DP: Issue #8140: extend compileall to compile single files. Add -i option.
+---
+ Lib/compileall.py | 129 ++++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 91 insertions(+), 38 deletions(-)
+
+diff --git a/Lib/compileall.py b/Lib/compileall.py
+index b21d95f..7d3662c 100644
 --- a/Lib/compileall.py
 +++ b/Lib/compileall.py
-@@ -16,7 +16,7 @@
+@@ -16,7 +16,7 @@ import os
  import sys
  import py_compile
  
@@ -10,7 +20,7 @@
  
  def compile_dir(dir, maxlevels=10, ddir=None,
                  force=0, rx=None, quiet=0):
-@@ -47,35 +47,9 @@
+@@ -47,35 +47,9 @@ def compile_dir(dir, maxlevels=10, ddir=None,
              dfile = os.path.join(ddir, name)
          else:
              dfile = None
@@ -49,7 +59,7 @@
          elif maxlevels > 0 and \
               name != os.curdir and name != os.pardir and \
               os.path.isdir(fullname) and \
-@@ -84,6 +58,53 @@
+@@ -84,6 +58,53 @@ def compile_dir(dir, maxlevels=10, ddir=None,
                  success = 0
      return success
  
@@ -103,7 +113,7 @@
  def compile_path(skip_curdir=1, maxlevels=0, force=0, quiet=0):
      """Byte-compile all module on sys.path.
  
-@@ -104,15 +125,34 @@
+@@ -104,15 +125,34 @@ def compile_path(skip_curdir=1, maxlevels=0, force=0, quiet=0):
                                                force, quiet=quiet)
      return success
  
@@ -140,7 +150,7 @@
          print "-l: don't recurse down"
          print "-f: force rebuild even if timestamps are up-to-date"
          print "-q: quiet operation"
-@@ -120,12 +160,14 @@
+@@ -120,12 +160,14 @@ def main():
          print "   if no directory arguments, -l sys.path is assumed"
          print "-x regexp: skip files matching the regular expression regexp"
          print "   the regexp is search for in the full path of the file"
@@ -155,7 +165,7 @@
      for o, a in opts:
          if o == '-l': maxlevels = 0
          if o == '-d': ddir = a
-@@ -134,17 +176,28 @@
+@@ -134,17 +176,28 @@ def main():
          if o == '-x':
              import re
              rx = re.compile(a)

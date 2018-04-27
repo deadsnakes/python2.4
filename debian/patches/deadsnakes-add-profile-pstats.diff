@@ -1,5 +1,18 @@
-# Add Lib/{profile,pstats}.py from upstream tarball.
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:23 -0700
+Subject: deadsnakes-add-profile-pstats
 
+# Add Lib/{profile,pstats}.py from upstream tarball.
+---
+ Lib/profile.py | 613 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Lib/pstats.py  | 643 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 1256 insertions(+)
+ create mode 100644 Lib/profile.py
+ create mode 100644 Lib/pstats.py
+
+diff --git a/Lib/profile.py b/Lib/profile.py
+new file mode 100644
+index 0000000..803173b
 --- /dev/null
 +++ b/Lib/profile.py
 @@ -0,0 +1,613 @@
@@ -616,6 +629,9 @@
 +        run('execfile(%r)' % (sys.argv[0],), options.outfile, options.sort)
 +    else:
 +        print "Usage: ", usage
+diff --git a/Lib/pstats.py b/Lib/pstats.py
+new file mode 100644
+index 0000000..5979a61
 --- /dev/null
 +++ b/Lib/pstats.py
 @@ -0,0 +1,643 @@

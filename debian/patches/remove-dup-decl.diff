@@ -1,8 +1,17 @@
-# DP: Remove duplicate PyCallable_Check declaration.
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:22 -0700
+Subject: remove-dup-decl
 
+# DP: Remove duplicate PyCallable_Check declaration.
+---
+ Include/abstract.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Include/abstract.h b/Include/abstract.h
+index 17ce105..cd2daa8 100644
 --- a/Include/abstract.h
 +++ b/Include/abstract.h
-@@ -283,9 +283,10 @@
+@@ -283,9 +283,10 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*/
  
         */
  

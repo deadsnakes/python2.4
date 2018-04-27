@@ -1,7 +1,41 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:23 -0700
+Subject: signal.set_wakeup_fd-doc
+
 # DP: Backport new function signal.set_wakeup_fd from the trunk (documentation)
+---
+ Doc/api/exceptions.tex | 12 ++++++++++++
+ Doc/lib/libsignal.tex  | 17 +++++++++++++++++
+ 2 files changed, 29 insertions(+)
+
+diff --git a/Doc/api/exceptions.tex b/Doc/api/exceptions.tex
+index 784b936..5cac166 100644
+--- a/Doc/api/exceptions.tex
++++ b/Doc/api/exceptions.tex
+@@ -309,6 +309,18 @@ for each thread.
+   % thread.interrupt_main() (used from IDLE), so it's still needed.
+ \end{cfuncdesc}
+ 
++\begin{cfuncdesc}{void}{PyErr_SetWakeupFd}{int fd}
++  This utility function specifies a file descriptor to which a
++  \code{\\0} byte will be written whenever a signal is received.  It
++  returns the previous such file descriptor.  The value \code{-1}
++  disables the feature; this is the initial state.  This is equivalent
++  to \module{signal}.\function{set_wakeup_fd} in Python, but without
++  any error checking.  \var{fd} should be a valid file descriptor.
++  The function should only be called from the main thread.
++
++  This is an Ubuntu specific addition, backported from 2.6.
++\end{cfuncdesc}
++
+ \begin{cfuncdesc}{PyObject*}{PyErr_NewException}{char *name,
+                                                  PyObject *base,
+                                                  PyObject *dict}
+diff --git a/Doc/lib/libsignal.tex b/Doc/lib/libsignal.tex
+index cfdb4dd..88e206f 100644
 --- a/Doc/lib/libsignal.tex
 +++ b/Doc/lib/libsignal.tex
-@@ -125,6 +125,23 @@
+@@ -125,6 +125,23 @@ The \module{signal} module defines the following functions:
    Windows. (See the \UNIX{} man page \manpage{signal}{2}.)
  \end{funcdesc}
  
@@ -25,24 +59,3 @@
  \begin{funcdesc}{signal}{signalnum, handler}
    Set the handler for signal \var{signalnum} to the function
    \var{handler}.  \var{handler} can be a callable Python object
---- a/Doc/api/exceptions.tex
-+++ b/Doc/api/exceptions.tex
-@@ -309,6 +309,18 @@
-   % thread.interrupt_main() (used from IDLE), so it's still needed.
- \end{cfuncdesc}
- 
-+\begin{cfuncdesc}{void}{PyErr_SetWakeupFd}{int fd}
-+  This utility function specifies a file descriptor to which a
-+  \code{\\0} byte will be written whenever a signal is received.  It
-+  returns the previous such file descriptor.  The value \code{-1}
-+  disables the feature; this is the initial state.  This is equivalent
-+  to \module{signal}.\function{set_wakeup_fd} in Python, but without
-+  any error checking.  \var{fd} should be a valid file descriptor.
-+  The function should only be called from the main thread.
-+
-+  This is an Ubuntu specific addition, backported from 2.6.
-+\end{cfuncdesc}
-+
- \begin{cfuncdesc}{PyObject*}{PyErr_NewException}{char *name,
-                                                  PyObject *base,
-                                                  PyObject *dict}

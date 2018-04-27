@@ -1,7 +1,17 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:21 -0700
+Subject: issue8154
+
 # DP: Issue #8154, fix segfault with os.execlp('true')
+---
+ Modules/posixmodule.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/Modules/posixmodule.c b/Modules/posixmodule.c
+index dc7f723..4ac982f 100644
 --- a/Modules/posixmodule.c
 +++ b/Modules/posixmodule.c
-@@ -2217,6 +2217,11 @@
+@@ -2217,6 +2217,11 @@ posix_execv(PyObject *self, PyObject *args)
                  PyMem_Free(path);
  		return NULL;
  	}

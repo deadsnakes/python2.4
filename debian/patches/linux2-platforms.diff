@@ -1,5 +1,59 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:21 -0700
+Subject: linux2-platforms
+
 # DP: Add linux2 platform definitions for alpha, hppa, mips, mipsel, sparc.
 # DP: See bug #499132
+---
+ Lib/plat-linux2-alpha/CDROM.py | 207 ++++++++++++++
+ Lib/plat-linux2-alpha/DLFCN.py |  83 ++++++
+ Lib/plat-linux2-alpha/IN.py    | 615 +++++++++++++++++++++++++++++++++++++++++
+ Lib/plat-linux2-alpha/TYPES.py | 170 ++++++++++++
+ Lib/plat-linux2-alpha/regen    |   8 +
+ Lib/plat-linux2-hppa/CDROM.py  | 207 ++++++++++++++
+ Lib/plat-linux2-hppa/DLFCN.py  |  83 ++++++
+ Lib/plat-linux2-hppa/IN.py     | 615 +++++++++++++++++++++++++++++++++++++++++
+ Lib/plat-linux2-hppa/TYPES.py  | 170 ++++++++++++
+ Lib/plat-linux2-hppa/regen     |   8 +
+ Lib/plat-linux2-mips/CDROM.py  | 207 ++++++++++++++
+ Lib/plat-linux2-mips/DLFCN.py  |  83 ++++++
+ Lib/plat-linux2-mips/IN.py     | 615 +++++++++++++++++++++++++++++++++++++++++
+ Lib/plat-linux2-mips/TYPES.py  | 170 ++++++++++++
+ Lib/plat-linux2-mips/regen     |   8 +
+ Lib/plat-linux2-sparc/CDROM.py | 207 ++++++++++++++
+ Lib/plat-linux2-sparc/DLFCN.py |  83 ++++++
+ Lib/plat-linux2-sparc/IN.py    | 615 +++++++++++++++++++++++++++++++++++++++++
+ Lib/plat-linux2-sparc/TYPES.py | 170 ++++++++++++
+ Lib/plat-linux2-sparc/regen    |   8 +
+ Lib/posixfile.py               |   3 +-
+ Lib/test/regrtest.py           |   4 +
+ Lib/test/test_socket.py        |   6 +-
+ configure.in                   |  11 +
+ 24 files changed, 4353 insertions(+), 3 deletions(-)
+ create mode 100644 Lib/plat-linux2-alpha/CDROM.py
+ create mode 100644 Lib/plat-linux2-alpha/DLFCN.py
+ create mode 100644 Lib/plat-linux2-alpha/IN.py
+ create mode 100644 Lib/plat-linux2-alpha/TYPES.py
+ create mode 100644 Lib/plat-linux2-alpha/regen
+ create mode 100644 Lib/plat-linux2-hppa/CDROM.py
+ create mode 100644 Lib/plat-linux2-hppa/DLFCN.py
+ create mode 100644 Lib/plat-linux2-hppa/IN.py
+ create mode 100644 Lib/plat-linux2-hppa/TYPES.py
+ create mode 100644 Lib/plat-linux2-hppa/regen
+ create mode 100644 Lib/plat-linux2-mips/CDROM.py
+ create mode 100644 Lib/plat-linux2-mips/DLFCN.py
+ create mode 100644 Lib/plat-linux2-mips/IN.py
+ create mode 100644 Lib/plat-linux2-mips/TYPES.py
+ create mode 100644 Lib/plat-linux2-mips/regen
+ create mode 100644 Lib/plat-linux2-sparc/CDROM.py
+ create mode 100644 Lib/plat-linux2-sparc/DLFCN.py
+ create mode 100644 Lib/plat-linux2-sparc/IN.py
+ create mode 100644 Lib/plat-linux2-sparc/TYPES.py
+ create mode 100644 Lib/plat-linux2-sparc/regen
+
+diff --git a/Lib/plat-linux2-alpha/CDROM.py b/Lib/plat-linux2-alpha/CDROM.py
+new file mode 100644
+index 0000000..4340936
 --- /dev/null
 +++ b/Lib/plat-linux2-alpha/CDROM.py
 @@ -0,0 +1,207 @@
@@ -210,6 +264,9 @@
 +DVD_CGMS_RESTRICTED = 3
 +
 +CDROM_MAX_SLOTS = 256
+diff --git a/Lib/plat-linux2-alpha/DLFCN.py b/Lib/plat-linux2-alpha/DLFCN.py
+new file mode 100644
+index 0000000..e23340a
 --- /dev/null
 +++ b/Lib/plat-linux2-alpha/DLFCN.py
 @@ -0,0 +1,83 @@
@@ -296,6 +353,9 @@
 +RTLD_GLOBAL = 0x00100
 +RTLD_LOCAL = 0
 +RTLD_NODELETE = 0x01000
+diff --git a/Lib/plat-linux2-alpha/IN.py b/Lib/plat-linux2-alpha/IN.py
+new file mode 100644
+index 0000000..a397d51
 --- /dev/null
 +++ b/Lib/plat-linux2-alpha/IN.py
 @@ -0,0 +1,615 @@
@@ -914,6 +974,9 @@
 +def IN6_IS_ADDR_MC_ORGLOCAL(a): return \
 +
 +def IN6_IS_ADDR_MC_GLOBAL(a): return
+diff --git a/Lib/plat-linux2-alpha/TYPES.py b/Lib/plat-linux2-alpha/TYPES.py
+new file mode 100644
+index 0000000..0cdd599
 --- /dev/null
 +++ b/Lib/plat-linux2-alpha/TYPES.py
 @@ -0,0 +1,170 @@
@@ -1087,6 +1150,9 @@
 +def major(dev): return (((dev).__val[0] >> 8) & 0xff)
 +
 +def minor(dev): return ((dev).__val[0] & 0xff)
+diff --git a/Lib/plat-linux2-alpha/regen b/Lib/plat-linux2-alpha/regen
+new file mode 100644
+index 0000000..c76950e
 --- /dev/null
 +++ b/Lib/plat-linux2-alpha/regen
 @@ -0,0 +1,8 @@
@@ -1098,6 +1164,9 @@
 +esac
 +set -v
 +h2py -i '(u_long)' /usr/include/sys/types.h /usr/include/netinet/in.h /usr/include/dlfcn.h
+diff --git a/Lib/plat-linux2-hppa/CDROM.py b/Lib/plat-linux2-hppa/CDROM.py
+new file mode 100644
+index 0000000..4340936
 --- /dev/null
 +++ b/Lib/plat-linux2-hppa/CDROM.py
 @@ -0,0 +1,207 @@
@@ -1308,6 +1377,9 @@
 +DVD_CGMS_RESTRICTED = 3
 +
 +CDROM_MAX_SLOTS = 256
+diff --git a/Lib/plat-linux2-hppa/DLFCN.py b/Lib/plat-linux2-hppa/DLFCN.py
+new file mode 100644
+index 0000000..e23340a
 --- /dev/null
 +++ b/Lib/plat-linux2-hppa/DLFCN.py
 @@ -0,0 +1,83 @@
@@ -1394,6 +1466,9 @@
 +RTLD_GLOBAL = 0x00100
 +RTLD_LOCAL = 0
 +RTLD_NODELETE = 0x01000
+diff --git a/Lib/plat-linux2-hppa/IN.py b/Lib/plat-linux2-hppa/IN.py
+new file mode 100644
+index 0000000..71e0b84
 --- /dev/null
 +++ b/Lib/plat-linux2-hppa/IN.py
 @@ -0,0 +1,615 @@
@@ -2012,6 +2087,9 @@
 +def IN6_IS_ADDR_MC_ORGLOCAL(a): return \
 +
 +def IN6_IS_ADDR_MC_GLOBAL(a): return
+diff --git a/Lib/plat-linux2-hppa/TYPES.py b/Lib/plat-linux2-hppa/TYPES.py
+new file mode 100644
+index 0000000..0cdd599
 --- /dev/null
 +++ b/Lib/plat-linux2-hppa/TYPES.py
 @@ -0,0 +1,170 @@
@@ -2185,6 +2263,9 @@
 +def major(dev): return (((dev).__val[0] >> 8) & 0xff)
 +
 +def minor(dev): return ((dev).__val[0] & 0xff)
+diff --git a/Lib/plat-linux2-hppa/regen b/Lib/plat-linux2-hppa/regen
+new file mode 100644
+index 0000000..c76950e
 --- /dev/null
 +++ b/Lib/plat-linux2-hppa/regen
 @@ -0,0 +1,8 @@
@@ -2196,6 +2277,9 @@
 +esac
 +set -v
 +h2py -i '(u_long)' /usr/include/sys/types.h /usr/include/netinet/in.h /usr/include/dlfcn.h
+diff --git a/Lib/plat-linux2-mips/CDROM.py b/Lib/plat-linux2-mips/CDROM.py
+new file mode 100644
+index 0000000..4340936
 --- /dev/null
 +++ b/Lib/plat-linux2-mips/CDROM.py
 @@ -0,0 +1,207 @@
@@ -2406,6 +2490,9 @@
 +DVD_CGMS_RESTRICTED = 3
 +
 +CDROM_MAX_SLOTS = 256
+diff --git a/Lib/plat-linux2-mips/DLFCN.py b/Lib/plat-linux2-mips/DLFCN.py
+new file mode 100644
+index 0000000..9fbb22b
 --- /dev/null
 +++ b/Lib/plat-linux2-mips/DLFCN.py
 @@ -0,0 +1,83 @@
@@ -2492,6 +2579,9 @@
 +RTLD_GLOBAL = 0x00004
 +RTLD_LOCAL = 0
 +RTLD_NODELETE = 0x01000
+diff --git a/Lib/plat-linux2-mips/IN.py b/Lib/plat-linux2-mips/IN.py
+new file mode 100644
+index 0000000..514a13e
 --- /dev/null
 +++ b/Lib/plat-linux2-mips/IN.py
 @@ -0,0 +1,615 @@
@@ -3110,6 +3200,9 @@
 +def IN6_IS_ADDR_MC_ORGLOCAL(a): return \
 +
 +def IN6_IS_ADDR_MC_GLOBAL(a): return
+diff --git a/Lib/plat-linux2-mips/TYPES.py b/Lib/plat-linux2-mips/TYPES.py
+new file mode 100644
+index 0000000..0cdd599
 --- /dev/null
 +++ b/Lib/plat-linux2-mips/TYPES.py
 @@ -0,0 +1,170 @@
@@ -3283,6 +3376,9 @@
 +def major(dev): return (((dev).__val[0] >> 8) & 0xff)
 +
 +def minor(dev): return ((dev).__val[0] & 0xff)
+diff --git a/Lib/plat-linux2-mips/regen b/Lib/plat-linux2-mips/regen
+new file mode 100644
+index 0000000..c76950e
 --- /dev/null
 +++ b/Lib/plat-linux2-mips/regen
 @@ -0,0 +1,8 @@
@@ -3294,6 +3390,9 @@
 +esac
 +set -v
 +h2py -i '(u_long)' /usr/include/sys/types.h /usr/include/netinet/in.h /usr/include/dlfcn.h
+diff --git a/Lib/plat-linux2-sparc/CDROM.py b/Lib/plat-linux2-sparc/CDROM.py
+new file mode 100644
+index 0000000..4340936
 --- /dev/null
 +++ b/Lib/plat-linux2-sparc/CDROM.py
 @@ -0,0 +1,207 @@
@@ -3504,6 +3603,9 @@
 +DVD_CGMS_RESTRICTED = 3
 +
 +CDROM_MAX_SLOTS = 256
+diff --git a/Lib/plat-linux2-sparc/DLFCN.py b/Lib/plat-linux2-sparc/DLFCN.py
+new file mode 100644
+index 0000000..e23340a
 --- /dev/null
 +++ b/Lib/plat-linux2-sparc/DLFCN.py
 @@ -0,0 +1,83 @@
@@ -3590,6 +3692,9 @@
 +RTLD_GLOBAL = 0x00100
 +RTLD_LOCAL = 0
 +RTLD_NODELETE = 0x01000
+diff --git a/Lib/plat-linux2-sparc/IN.py b/Lib/plat-linux2-sparc/IN.py
+new file mode 100644
+index 0000000..294128c
 --- /dev/null
 +++ b/Lib/plat-linux2-sparc/IN.py
 @@ -0,0 +1,615 @@
@@ -4208,6 +4313,9 @@
 +def IN6_IS_ADDR_MC_ORGLOCAL(a): return \
 +
 +def IN6_IS_ADDR_MC_GLOBAL(a): return
+diff --git a/Lib/plat-linux2-sparc/TYPES.py b/Lib/plat-linux2-sparc/TYPES.py
+new file mode 100644
+index 0000000..0cdd599
 --- /dev/null
 +++ b/Lib/plat-linux2-sparc/TYPES.py
 @@ -0,0 +1,170 @@
@@ -4381,6 +4489,9 @@
 +def major(dev): return (((dev).__val[0] >> 8) & 0xff)
 +
 +def minor(dev): return ((dev).__val[0] & 0xff)
+diff --git a/Lib/plat-linux2-sparc/regen b/Lib/plat-linux2-sparc/regen
+new file mode 100644
+index 0000000..c76950e
 --- /dev/null
 +++ b/Lib/plat-linux2-sparc/regen
 @@ -0,0 +1,8 @@
@@ -4392,9 +4503,11 @@
 +esac
 +set -v
 +h2py -i '(u_long)' /usr/include/sys/types.h /usr/include/netinet/in.h /usr/include/dlfcn.h
+diff --git a/Lib/posixfile.py b/Lib/posixfile.py
+index 5a7ed06..239f233 100644
 --- a/Lib/posixfile.py
 +++ b/Lib/posixfile.py
-@@ -207,7 +207,8 @@
+@@ -207,7 +207,8 @@ class _posixfile_:
              elif sys.platform in ['aix3', 'aix4']:
                  l_type, l_whence, l_start, l_len, l_sysid, l_pid, l_vfs = \
                      struct.unpack('hhlllii', flock)
@@ -4404,9 +4517,11 @@
                  l_type, l_whence, l_start, l_len, l_pid, l_sysid = \
                      struct.unpack('hhllhh', flock)
              else:
+diff --git a/Lib/test/regrtest.py b/Lib/test/regrtest.py
+index 9be9bb9..f9b8bc4 100755
 --- a/Lib/test/regrtest.py
 +++ b/Lib/test/regrtest.py
-@@ -1114,6 +1114,10 @@
+@@ -1114,6 +1114,10 @@ _expectations = {
          test_zlib
          """,
  }
@@ -4417,9 +4532,11 @@
  _expectations['freebsd5'] = _expectations['freebsd4']
  _expectations['freebsd6'] = _expectations['freebsd4']
  
+diff --git a/Lib/test/test_socket.py b/Lib/test/test_socket.py
+index 4b4a628..1682503 100644
 --- a/Lib/test/test_socket.py
 +++ b/Lib/test/test_socket.py
-@@ -313,8 +313,10 @@
+@@ -313,8 +313,10 @@ class GeneralModuleTests(unittest.TestCase):
          # Find one service that exists, then check all the related interfaces.
          # I've ordered this by protocols that have both a tcp and udp
          # protocol, at least for modern Linuxes.
@@ -4432,9 +4549,11 @@
              # avoid the 'echo' service on this platform, as there is an
              # assumption breaking non-standard port/protocol entry
              services = ('daytime', 'qotd', 'domain')
+diff --git a/configure.in b/configure.in
+index bbc6586..56c9b49 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -175,6 +175,17 @@
+@@ -175,6 +175,17 @@ then
  	MACHDEP="$ac_md_system$ac_md_release"
  
  	case $MACHDEP in

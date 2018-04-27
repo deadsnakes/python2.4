@@ -1,7 +1,17 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:21 -0700
+Subject: tk8.5-compat
+
 # DP: Fix python2.5 / tk8.5 incompatibility (http://bugs.python.org/issue2693)
+---
+ Lib/idlelib/WidgetRedirector.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Lib/idlelib/WidgetRedirector.py b/Lib/idlelib/WidgetRedirector.py
+index df60cea..12e81c0 100644
 --- a/Lib/idlelib/WidgetRedirector.py
 +++ b/Lib/idlelib/WidgetRedirector.py
-@@ -53,7 +53,10 @@
+@@ -53,7 +53,10 @@ class WidgetRedirector:
              if m:
                  return m(*args)
              else:

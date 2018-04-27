@@ -1,8 +1,18 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:21 -0700
+Subject: issue8233
+
 # DP: Issue #8233: When run as a script, py_compile.py optionally takes a single
 # DP: argument `-`. Backport from the trunk.
+---
+ Lib/py_compile.py | 32 ++++++++++++++++++++++++++------
+ 1 file changed, 26 insertions(+), 6 deletions(-)
+
+diff --git a/Lib/py_compile.py b/Lib/py_compile.py
+index 02b0136..feb8c94 100644
 --- a/Lib/py_compile.py
 +++ b/Lib/py_compile.py
-@@ -149,16 +149,36 @@
+@@ -149,16 +149,36 @@ def main(args=None):
      not specified) are compiled and the resulting bytecode is cached
      in the normal manner.  This function does not search a directory
      structure to locate source files; it only compiles files named

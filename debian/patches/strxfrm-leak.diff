@@ -1,8 +1,17 @@
-# DP: Fix off-by-one bug in strxfrm()
+From: Felix Krull <f_krull@gmx.de>
+Date: Fri, 27 Apr 2018 08:06:22 -0700
+Subject: strxfrm-leak
 
+# DP: Fix off-by-one bug in strxfrm()
+---
+ Modules/_localemodule.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Modules/_localemodule.c b/Modules/_localemodule.c
+index af6a615..e2462fc 100644
 --- a/Modules/_localemodule.c
 +++ b/Modules/_localemodule.c
-@@ -357,7 +357,7 @@
+@@ -357,7 +357,7 @@ PyLocale_strxfrm(PyObject* self, PyObject* args)
      buf = PyMem_Malloc(n1);
      if (!buf)
          return PyErr_NoMemory();
