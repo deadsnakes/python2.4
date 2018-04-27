@@ -1,3 +1,10 @@
+python2.4 (2.4.6-8+bionic1) bionic; urgency=medium
+
+  * Imported from Xenial package.
+  * Bump emacs to emacs25.
+
+ -- Anthony Sottile <asottile@umich.edu>  Thu, 26 Apr 2018 21:00:15 -0700
+
 python2.4 (2.4.6-8+xenial1) xenial; urgency=medium
 
   * Imported from Wily package.
