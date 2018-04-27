@@ -56,3 +56,4 @@ deadsnakes-bsddb-module-py2.7.x.diff
 deadsnakes-force-info-docs.diff
 deadsnakes-platform-linux2.diff
 readline-6.3-compat.diff
+0059-Fix-perl-imports-from-.-for-perl-5.26.patch
