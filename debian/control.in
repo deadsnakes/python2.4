@@ -5,7 +5,7 @@ Maintainer: Felix Krull <f_krull@gmx.de>
 XSBC-Original-Maintainer: Matthias Klose <doko@debian.org>
 Build-Depends: debhelper (>= 7), autoconf,
    mime-support, netbase, lsb-release, bzip2, python,
-   zlib1g-dev, libbz2-dev, libdb-dev, libssl-dev, libreadline-dev,
+   zlib1g-dev, libbz2-dev, libdb-dev, libssl1.0-dev, libreadline-dev,
    libncursesw5-dev (>= 5.3), tk8.5-dev, blt-dev (>= 2.4z), libgpm2 [!hurd-i386 !kfreebsd-i386 !kfreebsd-amd64],
    libbluetooth-dev [!hurd-i386 !kfreebsd-i386 !kfreebsd-amd64], locales [!armel !avr32 !hppa !ia64 !mipsel],
    libgdbm-dev,
@@ -70,7 +70,7 @@ Description: Examples for the Python language (version @VER@)
 
 Package: @PVER@-dev
 Architecture: any
-Depends: @PVER@ (= ${binary:Version}), lib@PVER@ (= ${binary:Version}), libssl-dev, ${shlibs:Depends}, ${misc:Depends}
+Depends: @PVER@ (= ${binary:Version}), lib@PVER@ (= ${binary:Version}), libssl1.0-dev, ${shlibs:Depends}, ${misc:Depends}
 Recommends: libc6-dev | libc-dev
 Description: Header files and a static library for Python (version @VER@)
  Header files, a static library and development tools for building
