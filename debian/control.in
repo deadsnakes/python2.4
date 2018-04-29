@@ -13,7 +13,7 @@ Build-Depends: debhelper (>= 7), autoconf,
 Build-Depends-Indep: libhtml-tree-perl, texlive-latex-recommended, texinfo, emacs25, debiandoc-sgml, latex2html
 Build-Conflicts: tcl8.4-dev, tk8.4-dev, tcl8.3-dev, tk8.3-dev, @PVER@-xml, python-xml, autoconf2.13
 XS-Python-Version: @VER@
-Standards-Version: 3.9.6
+Standards-Version: 4.1.4
 Homepage: http://python.org/
 Vcs-Browser: https://bitbucket.org/fk/deadsnakes-@PVER@
 Vcs-Hg: https://bitbucket.org/fk/deadsnakes-@PVER@
